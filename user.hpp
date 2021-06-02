@@ -9,12 +9,12 @@ class user {
     friend std::ostream& operator << (std::ostream &out, const user &_user) ;
 
 private:
-    string username, password, name, mailAddr ;
+    String username, password, name, mailAddr ;
     int privilege ;
 
 public:
     user () {}
-    user (const string &_username, const string &_password, const string &_name, const string &_mailAddr, const int _privilege) {
+    user (const String &_username, const String &_password, const String &_name, const String &_mailAddr, const int _privilege) {
         username = _username; password = _password ;
         name = _name; mailAddr = _mailAddr ;
         privilege = _privilege ;
@@ -24,19 +24,19 @@ public:
         return privilege ;
     }
 
-    void login (const string &_password) const {
+    void login (const String &_password) const {
         if (password != _password) throw "wrong password" ;
     }
 
-    void modifyPassword (const string &_password) {
+    void modifyPassword (const String &_password) {
         password = _password ;
     }
 
-    void modifyName (const string &_name) {
+    void modifyName (const String &_name) {
         name = _name ;
     }
 
-    void modifyMailAddress (const string &_mailAddr) {
+    void modifyMailAddress (const String &_mailAddr) {
         mailAddr = _mailAddr ;
     }
 

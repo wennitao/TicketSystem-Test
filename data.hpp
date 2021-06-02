@@ -7,15 +7,15 @@
 #include "string.h"
 
 struct data {
-    string str; int pos ;
+    String str; int pos ;
     data () {
         pos = -1 ;
     }
     data (const char *_str, int p) {
-        str = string (_str) ;
+        str = String (_str) ;
         pos = p ;
     }
-    data (const string _str, int p) {
+    data (const String _str, int p) {
         str = _str; pos = p ;
     }
     // void print() const {

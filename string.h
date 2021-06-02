@@ -4,15 +4,15 @@
 #include <iostream>
 #include <cstring>
 
-class string {
+class String {
 
-    friend std::ostream& operator << (std::ostream &out, const string &str) ;
+    friend std::ostream& operator << (std::ostream &out, const String &str) ;
 
 private:
     char str[110];
     int len = 0;//记录字母个数，有一个记一个
 public:
-    string(const char *ch){
+    String(const char *ch){
         memset (str, 0, sizeof str) ;
         int i = 0;
         while (ch[i] != '\0'){
@@ -21,22 +21,22 @@ public:
         }
         len = i ;
     }
-    string(){
+    String(){
         memset(str , 0 , sizeof str);
         len = 0;
     }
-    string(const string &ot){
+    String(const String &ot){
         memset (str, 0, sizeof str) ;
         for (int i = 0; i < ot.len; ++i) {
             str[i] = ot.str[i];
         }
         len = ot.len; str[len] = 0 ;
     }
-    ~string(){
+    ~String(){
         len = 0;
         memset(str , 0 , sizeof str);
     }
-    string& operator=(const string &ot){
+    String& operator=(const String &ot){
         if (this == &ot){
             return *this;
         }
@@ -49,22 +49,22 @@ public:
         memset(str , 0 , sizeof str);
         len = 0;
     }
-    bool operator<(const string &ot) const {
+    bool operator<(const String &ot) const {
         return strcmp(this->str , ot.str) < 0;
     }
-    bool operator<=(const string &ot) const {
+    bool operator<=(const String &ot) const {
         return strcmp(this->str , ot.str) <= 0;
     }
-    bool operator==(const string &ot) const {
+    bool operator==(const String &ot) const {
         return strcmp(this->str , ot.str) == 0;
     }
-    bool operator != (const string &ot) const {
+    bool operator != (const String &ot) const {
         return strcmp (this -> str, ot.str) != 0 ;
     }
-    bool operator>(const string &ot) const {
+    bool operator>(const String &ot) const {
         return strcmp(this->str , ot.str) > 0;
     }
-    bool operator>=(const string &ot) const {
+    bool operator>=(const String &ot) const {
         return strcmp(this->str , ot.str) >= 0;
     }
 
@@ -87,8 +87,8 @@ public:
         return res ;
     }
 
-    string substr (int l, int r) {
-        string res ;
+    String substr (int l, int r) {
+        String res ;
         for (int i = l; i <= r; i ++) res.str[i - l] = str[i] ;
         res.len = r - l + 1 ;
         return res ;

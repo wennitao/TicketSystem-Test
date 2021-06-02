@@ -7,6 +7,7 @@
 
 #include "string.h"
 #include "time.hpp"
+#include "HashMap.h"
 
 class train {
 
@@ -15,12 +16,14 @@ private:
     int stationNum, seatNum, seat[110][110] ;
     int priceSum[110], travelTimesSum[110], stopoverTimesSum[110] ;
     char type ;
-    string trainID, stations[110] ;
+    String trainID, stations[110] ;
     Time startTime, saleDate[3] ;
+
+    HashMap<String, int> stationHashMap ;
 
 public:
     train () {}
-    train (const string &_trainID, const int _stationNum, const string *_stations, const int _seatNum, const int *_prices, const Time &_startTime, const int *_travelTimes, const int *_stopoverTimes, const Time *_saleDate, const char _type) {
+    train (const String &_trainID, const int _stationNum, const String *_stations, const int _seatNum, const int *_prices, const Time &_startTime, const int *_travelTimes, const int *_stopoverTimes, const Time *_saleDate, const char _type) {
         trainID = _trainID ;
         stationNum = _stationNum ;
         for (int i = 1; i <= stationNum; i ++) stations[i] = _stations[i] ;
@@ -47,6 +50,9 @@ public:
         for (int i = 2; i < stationNum; i ++)
             stopoverTimesSum[i] = stopoverTimesSum[i - 1] + _stopoverTimes[i - 1] ;
         stopoverTimesSum[stationNum] = stopoverTimesSum[stationNum - 1] ;
+
+        for (int i = 1; i <= stationNum; i ++)
+            stationHashMap.insert (stations[i], i) ;
     }
 
     void release () {
@@ -60,6 +66,14 @@ public:
 
     bool runningOnDate (const Time &date) const {
         return saleDate[1] <= date && date <= saleDate[2] ;
+    }
+
+    bool canDepartOnDate (const Time &date) const {
+        return 0 ;
+    }
+    
+    bool direction (const String &fromStation, const String &toStation) {
+
     }
 
     void print (const Time &date) const {

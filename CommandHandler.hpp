@@ -5,6 +5,7 @@
 #include <fstream>
 #include <cstring>
 #include <vector>
+#include <algorithm>
 
 #include "main.h"
 #include "Bpt_and_database.h"
@@ -15,6 +16,7 @@
 #include "user.hpp"
 #include "train.hpp"
 #include "time.hpp"
+#include "order.hpp"
 
 class CommandHandler {
 private:
@@ -107,15 +109,15 @@ public:
     }
 
     void add_user () {
-        string cur_username, username, password, name, mailAddr ;
+        String cur_username, username, password, name, mailAddr ;
         int privilege ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'c') cur_username = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'u') username = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'p') password = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'n') name = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'm') mailAddr = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'g') privilege = string (argument[i + 1]).toInt() ;
+            if (argument[i][1] == 'c') cur_username = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'p') password = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'n') name = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'm') mailAddr = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'g') privilege = String (argument[i + 1]).toInt() ;
         }
 
         if (users.empty()) {
@@ -139,10 +141,10 @@ public:
     }
 
     void login () {
-        string username, password ;
+        String username, password ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'u') username = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'p') password = string (argument[i + 1]) ;
+            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'p') password = String (argument[i + 1]) ;
         }
 
         std::vector<int> pos ;
@@ -159,9 +161,9 @@ public:
     }
 
     void logout () {
-        string username ;
+        String username ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'u') username = string (argument[i + 1]) ;
+            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
         }
         std::vector<int> pos ;
         curUsers.find (data (username, 0), pos) ;
@@ -172,10 +174,10 @@ public:
     }
 
     void query_profile () {
-        string cur_username, username ;
+        String cur_username, username ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'c') cur_username = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'u') username = string (argument[i + 1]) ;
+            if (argument[i][1] == 'c') cur_username = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
         }
 
         std::vector<int> pos ;
@@ -195,15 +197,15 @@ public:
     }
 
     void modify_profile () {
-        string cur_username, username, password, name, mailAddr ;
+        String cur_username, username, password, name, mailAddr ;
         int privilege = -1 ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'c') cur_username = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'u') username = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'p') password = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'n') name = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'm') mailAddr = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'g') privilege = string (argument[i + 1]).toInt() ;
+            if (argument[i][1] == 'c') cur_username = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'p') password = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'n') name = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'm') mailAddr = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'g') privilege = String (argument[i + 1]).toInt() ;
         }
 
         std::vector<int> pos ;
@@ -230,7 +232,7 @@ public:
         std::cout << modify_user << std::endl ;
     }
 
-    void split_string (string *res, char *str) {
+    void split_String (String *res, char *str) {
         int cur_id = 1, cur_len = 0, len = strlen (str) ;
         for (int i = 0; i < len; i ++) {
             if (str[i] == '|') {
@@ -256,22 +258,22 @@ public:
 
     void add_train() {
         int stationNum, seatNum, prices[110], travelTimes[110], stopoverTimes[110] ;
-        string trainID, stations[110] ;
+        String trainID, stations[110] ;
         char type ;
         Time startTime, saleDate[3] ;
 
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'i') trainID = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'n') stationNum = string (argument[i + 1]).toInt() ;
-            else if (argument[i][1] == 'm') seatNum = string (argument[i + 1]).toInt() ;
-            else if (argument[i][1] == 's') split_string (stations, argument[i + 1]) ;
+            if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'n') stationNum = String (argument[i + 1]).toInt() ;
+            else if (argument[i][1] == 'm') seatNum = String (argument[i + 1]).toInt() ;
+            else if (argument[i][1] == 's') split_String (stations, argument[i + 1]) ;
             else if (argument[i][1] == 'p') split_int (prices, argument[i + 1]) ;
-            else if (argument[i][1] == 'x') startTime = Time (string ("00-00"), argument[i + 1]) ;
+            else if (argument[i][1] == 'x') startTime = Time (String ("00-00"), argument[i + 1]) ;
             else if (argument[i][1] == 't') split_int (travelTimes, argument[i + 1]) ;
             else if (argument[i][1] == 'o') split_int (stopoverTimes, argument[i + 1]) ;
             else if (argument[i][1] == 'd') {
-                string tmp = string (argument[i + 1]) ;
-                saleDate[1] = Time (tmp.substr (0, 4), string ("00-00")); saleDate[2] = Time (tmp.substr (6, 10), string ("00-00")) ;
+                String tmp = String (argument[i + 1]) ;
+                saleDate[1] = Time (tmp.substr (0, 4), String ("00-00")); saleDate[2] = Time (tmp.substr (6, 10), String ("00-00")) ;
             }
             else if (argument[i][1] == 'y') type = argument[i + 1][0] ;
         }
@@ -292,9 +294,9 @@ public:
     }
 
     void release_train () {
-        string trainID ;
+        String trainID ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'i') trainID = string (argument[i + 1]) ;
+            if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
         }
 
         std::vector<int> pos ;
@@ -309,11 +311,11 @@ public:
     }
 
     void query_train () {
-        string trainID ;
+        String trainID ;
         Time date ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'i') trainID = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'd') date = Time (argument[i + 1], string ("00:00")) ;
+            if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'd') date = Time (argument[i + 1], String ("00:00")) ;
         }
 
         std::vector<int> pos ;
@@ -326,9 +328,9 @@ public:
     }
 
     void delete_train () {
-        string trainID ;
+        String trainID ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'i') trainID = string (argument[i + 1]) ;
+            if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
         }
 
         std::vector<int> pos ;
@@ -343,17 +345,45 @@ public:
     }
 
     void query_ticket () {
-        string fromStation, toStation ;
+        String fromStation, toStation ;
         Time date ;
         int priority = 0 ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 's') fromStation = string (argument[i + 1]) ;
-            else if (argument[i][1] == 't') toStation = string (argument[i + 1]) ;
-            else if (argument[i][1] == 'd') date = Time (string (argument[i + 1]), string ("00:00")) ;
-            else if (argument[i][1] == 'p') priority = string (argument[i + 1]) == string ("time") ? 0 : 1 ;
+            if (argument[i][1] == 's') fromStation = String (argument[i + 1]) ;
+            else if (argument[i][1] == 't') toStation = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'd') date = Time (String (argument[i + 1]), String ("00:00")) ;
+            else if (argument[i][1] == 'p') priority = String (argument[i + 1]) == String ("time") ? 0 : 1 ;
         }
 
-        
+        std::vector<int> train1, train2 ;
+        std::vector<int> pos ;
+        trainStations.find (data (fromStation, 0), train1) ;
+        trainStations.find (data (toStation, 0), train2) ;
+
+        std::sort (train1.begin(), train1.end()) ;
+        std::sort (train2.begin(), train2.end()) ;
+        std::vector<int> possible_trains ;
+        int train1_id = 0, train2_id = 0 ;
+        while (train1_id < train1.size() && train2_id < train2.size()) {
+            if (train1[train1_id] < train2[train2_id]) train1_id ++ ;
+            else if (train1[train1_id] > train2[train2_id]) train2_id ++ ;
+            else {
+                possible_trains.push_back (train1[train1_id]) ;
+                train1_id ++; train2_id ++ ;
+            }
+        }
+
+        if (possible_trains.empty()) {
+            printf("0\n"); return ;
+        }
+
+        order *orders = new order[possible_trains.size()] ;
+        int order_cnt ;
+        for (int i = 0; i < possible_trains.size(); i ++) {
+            train cur_train = train_read (possible_trains[i]) ;
+            if (!cur_train.canDepartOnDate (date)) continue ;
+            if (!cur_train.direction (fromStation, toStation)) continue ;
+        }
     }
 
 } ;

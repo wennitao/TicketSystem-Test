@@ -17,7 +17,7 @@ private:
 
 public:
     Time () {}
-    Time (const string &date, const string &t) {
+    Time (const String &date, const String &t) {
         m = (date[0] - '0') * 10 + date[1] - '0' ;
         d = (date[3] - '0') * 10 + date[4] - '0' ;
         h = (t[0] - '0') * 10 + t[1] - '0' ;
