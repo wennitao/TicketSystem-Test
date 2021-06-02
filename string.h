@@ -8,7 +8,7 @@ class String {
 
     friend std::ostream& operator << (std::ostream &out, const String &str) ;
 
-private:
+public:
     char str[110];
     int len = 0;//记录字母个数，有一个记一个
 public:

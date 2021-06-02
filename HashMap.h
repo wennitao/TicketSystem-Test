@@ -6,8 +6,16 @@
 #define CODE_HASHMAP_H
 #include <functional>
 #include <iostream>
+#include "string.h"
 using namespace std;
-template<class Key , class Data , class Hash = std::hash<Key>>//key是站名 ， data是车站内容，即顺序
+int hash_string(String &str){
+    int res = 0;
+    for (int i = 0; i < str.len; ++i) {
+        res = (res + str[i] - 64) % 91815541;//-64以避免大小写
+    }
+    return res;
+};
+template<class Key , class Data >//key是站名 ， data是车站内容，即顺序
 class HashMap{
 private:
     const int size = 105;
@@ -23,7 +31,6 @@ private:
         pair(int l , int r):first(l),second(r){};
     };
     pair order[104];
-    Hash hash;
     int cur = 0;
     void sort(int l , int r){
         int left = l , right = r;
@@ -43,7 +50,7 @@ private:
 public:
     HashMap() = default;
     void insert(Key key1 , Data data1){
-        pair nod(hash(key1) % mod , data1);
+        pair nod(hash_string(key1) % mod , data1);
         order[++cur] = nod;
     }
     void sort(){
@@ -54,7 +61,7 @@ public:
         int r = cur + 1;
         while (l + 1 < r){
             int mid = (l + r) >> 1;
-            if (order[mid].first >= (hash(key1) % mod))r = mid;
+            if (order[mid].first >= (hash_string(key1) % mod))r = mid;
             else l = mid;
         }
         if (r == cur + 1)return -1;
