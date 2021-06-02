@@ -32,6 +32,10 @@ public:
         }
         len = ot.len; str[len] = 0 ;
     }
+    ~string(){
+        len = 0;
+        memset(str , 0 , sizeof str);
+    }
     string& operator=(const string &ot){
         if (this == &ot){
             return *this;
