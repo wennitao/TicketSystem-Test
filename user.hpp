@@ -1,5 +1,5 @@
-#ifndef TicketSystem_user
-#define TicketSystem_user
+#ifndef TicketSystem_User
+#define TicketSystem_User
 
 #include <iostream>
 #include "string.h"
