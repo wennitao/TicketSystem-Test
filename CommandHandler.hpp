@@ -103,7 +103,7 @@ public:
             } else if (strcmp (argument[1], "query_ticket") == 0) {
                 query_ticket () ;
             } else if (strcmp (argument[1], "query_transfer") == 0) {
-                
+
             }
         } catch (...) {
             printf("-1\n") ;
@@ -413,7 +413,7 @@ public:
     }
 
     void query_transfer () {
-
+        
     }
 
 } ;
