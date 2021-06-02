@@ -19,7 +19,7 @@ private:
     String trainID, stations[110] ;
     Time startTime, saleDate[3] ;
 
-    // HashMap<String, int> stationHashMap ;
+    HashMap stationHashMap ;
 
 public:
     train () {}
@@ -51,8 +51,8 @@ public:
             stopoverTimesSum[i] = stopoverTimesSum[i - 1] + _stopoverTimes[i - 1] ;
         stopoverTimesSum[stationNum] = stopoverTimesSum[stationNum - 1] ;
 
-        // for (int i = 1; i <= stationNum; i ++)
-        //     stationHashMap.insert (stations[i], i) ;
+        for (int i = 1; i <= stationNum; i ++)
+            stationHashMap.insert (stations[i], i) ;
     }
 
     String getTrainID () const {

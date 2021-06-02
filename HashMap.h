@@ -7,14 +7,7 @@
 #include <functional>
 #include <iostream>
 #include "string.h"
-using namespace std;
-int hash_string(String &s){
-    int res = 0;
-    for (int i = 0; i < str.len; ++i) {
-        res = (res + s.str[i] - 64) % 91815541;//-64以避免大小写
-    }
-    return res;
-};
+// using namespace std ;
 //template<class Key , class Data >//key是站名 ， data是车站内容，即顺序
 class HashMap{
 private:
@@ -39,7 +32,7 @@ private:
             while (order[left].first < mid) left++;
             while (order[right].first > mid) right--;
             if (left <= right){
-                swap(order[left] , order[right]);
+                std::swap (order[left] , order[right]);
                 left++;
                 right--;
             }
@@ -50,18 +43,19 @@ private:
 public:
     HashMap() = default;
     void insert(String key1 , int data1){
-        pair nod(hash_string(key1) % mod , data1);
+        pair nod(key1.hashit() % mod , data1);
         order[++cur] = nod;
     }
     void sort(){
         sort(1 , cur);
     }
     int find(String key1){
+        int hash_val = key1.hashit() ;
         int l = 0;
         int r = cur + 1;
         while (l + 1 < r){
             int mid = (l + r) >> 1;
-            if (order[mid].first >= (hash_string(key1) % mod))r = mid;
+            if (order[mid].first >= (hash_val % mod)) r = mid;
             else l = mid;
         }
         if (r == cur + 1)return -1;
