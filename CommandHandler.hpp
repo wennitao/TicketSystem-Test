@@ -96,6 +96,10 @@ public:
                 release_train() ;
             } else if (strcmp (argument[1], "query_train") == 0) {
                 query_train () ;
+            } else if (strcmp (argument[1], "delete_train") == 0) {
+                delete_train () ;
+            } else if (strcmp (argument[1], "query_ticket") == 0) {
+                query_ticket () ;
             }
         } catch (...) {
             printf("-1\n") ;
@@ -280,6 +284,10 @@ public:
         int train_file_pos = train_write (new_train) ;
         trains.insert (data (trainID, train_file_pos)) ;
 
+        for (int i = 1; i <= stationNum; i ++) {
+            trainStations.insert (data (stations[i], train_file_pos)) ;
+        }
+
         printf("0\n") ;
     }
 
@@ -316,6 +324,38 @@ public:
         if (!cur_train.runningOnDate (date)) throw "train doesn't run on this date" ;
         cur_train.print (date) ;
     }
+
+    void delete_train () {
+        string trainID ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'i') trainID = string (argument[i + 1]) ;
+        }
+
+        std::vector<int> pos ;
+        trains.find (data (trainID, 0), pos) ;
+        if (pos.empty()) throw "train not found" ;
+        int train_file_pos = pos[0] ;
+        train cur_train = train_read (train_file_pos) ;
+        if (cur_train.isReleased()) throw "already released" ;
+
+        trains.erase (data (trainID, train_file_pos)) ;
+        printf("0\n") ; 
+    }
+
+    void query_ticket () {
+        string fromStation, toStation ;
+        Time date ;
+        int priority = 0 ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 's') fromStation = string (argument[i + 1]) ;
+            else if (argument[i][1] == 't') toStation = string (argument[i + 1]) ;
+            else if (argument[i][1] == 'd') date = Time (string (argument[i + 1]), string ("00:00")) ;
+            else if (argument[i][1] == 'p') priority = string (argument[i + 1]) == string ("time") ? 0 : 1 ;
+        }
+
+
+    }
+
 } ;
 
 #endif

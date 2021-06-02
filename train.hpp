@@ -17,17 +17,17 @@ private:
     char type ;
     string trainID, stations[110] ;
     Time startTime, saleDate[3] ;
-    std::map<string, int> stationID ;
 
 public:
     train () {}
-    train (const string &_trainID, const int _stationNum, const string *_stations, const int _seatNum, const int *_prices, const Time &_startTime, const int *_travelTimes, const int *_stopoverTimes, const Time *_saleDate, const char type) {
+    train (const string &_trainID, const int _stationNum, const string *_stations, const int _seatNum, const int *_prices, const Time &_startTime, const int *_travelTimes, const int *_stopoverTimes, const Time *_saleDate, const char _type) {
         trainID = _trainID ;
         stationNum = _stationNum ;
         for (int i = 1; i <= stationNum; i ++) stations[i] = _stations[i] ;
         seatNum = _seatNum ;
         startTime = _startTime ;
         saleDate[1] = _saleDate[1]; saleDate[2] = _saleDate[2] ;
+        type = _type ;
         released = 0 ;
 
         int days = saleDate[2].daysBetweenTime (saleDate[1]) ;
@@ -47,14 +47,15 @@ public:
         for (int i = 2; i < stationNum; i ++)
             stopoverTimesSum[i] = stopoverTimesSum[i - 1] + _stopoverTimes[i - 1] ;
         stopoverTimesSum[stationNum] = stopoverTimesSum[stationNum - 1] ;
-
-        for (int i = 1; i <= stationNum; i ++)
-            stationID[stations[i]] = i ;
     }
 
     void release () {
         if (released) throw "already released" ;
         released = 1 ;
+    }
+
+    bool isReleased () {
+        return released ;
     }
 
     bool runningOnDate (const Time &date) const {

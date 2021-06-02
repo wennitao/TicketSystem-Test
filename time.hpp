@@ -46,7 +46,7 @@ public:
         Time res = *this ;
         res.min += _min ;
         res.h += res.min / 60; res.min %= 60 ;
-        res.d += res.h / 24; res.h %= 25 ;
+        res.d += res.h / 24; res.h %= 24 ;
         if (res.d > days[res.m]) res.d -= days[res.m], res.m ++ ;
         return res ;
     }
