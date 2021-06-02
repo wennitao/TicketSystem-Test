@@ -26,7 +26,7 @@ private:
 
 public:
     CommandHandler (const std::string _op) {
-        std::cout << _op << std::endl ;
+        // std::cout << _op << std::endl ;
         op = _op ;
     }
 
@@ -425,8 +425,8 @@ public:
         for (int i = 0; i < possible_trains.size(); i ++) {
             train cur_train = train_read (possible_trains[i]) ;
             if (!cur_train.isReleased()) continue ;
-            if (!cur_train.canDepartFromStationOnDate (date, fromStation)) continue ;
             if (!cur_train.direction (fromStation, toStation)) continue ;
+            if (!cur_train.canDepartFromStationOnDate (date, fromStation)) continue ;
             Time trainStartTime = cur_train.getStartTime (date, fromStation) ;
             orders.push_back (order (cur_train.getTrainID(), fromStation, toStation, 
             cur_train.getLeavingTime (trainStartTime, fromStation), 
@@ -476,8 +476,8 @@ public:
         train cur_train = train_read (train_file_pos) ;
 
         if (!cur_train.isReleased()) throw "train not released" ;
-        if (!cur_train.canDepartFromStationOnDate (date, fromStation)) throw "cannot depart" ;
         if (!cur_train.direction (fromStation, toStation)) throw "cannot depart" ;
+        if (!cur_train.canDepartFromStationOnDate (date, fromStation)) throw "cannot depart" ;
         if (ticketNum > cur_train.getSeatNum()) throw "no enough tickets" ;
 
         Time trainStartTime = cur_train.getStartTime (date, fromStation) ;

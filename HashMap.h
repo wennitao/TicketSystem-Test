@@ -15,19 +15,19 @@ private:
     const int mod = 291143;
     struct pair{
     public:
-        int first;//站名
+        unsigned long long first;//站名
         int second;//序号
         pair(){
             first = 0;
             second = 0;
         }
-        pair(int l , int r):first(l),second(r){};
+        pair(unsigned long long l , int r):first(l),second(r){};
     };
     pair order[104];
     int cur = 0;
     void sort(int l , int r){
         int left = l , right = r;
-        int mid = order[(l + r) >> 1].first;
+        unsigned long long mid = order[(l + r) >> 1].first;
         do{
             while (order[left].first < mid) left++;
             while (order[right].first > mid) right--;
@@ -50,7 +50,7 @@ public:
         sort(1 , cur);
     }
     int find (String key1) const {
-        int hash_val = key1.hashit() ;
+        unsigned long long hash_val = key1.hashit() ;
         int l = 0;
         int r = cur + 1;
         while (l + 1 < r){

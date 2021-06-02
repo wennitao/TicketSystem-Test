@@ -210,7 +210,7 @@ void Database::find(int nod, const data &x, std::vector<int> &cap) {
         cur = disk_read(cur.son[pos]);
     }
     int pos = 0;
-    while (cur.key[pos].str < x.str){
+    while (pos < cur.keycnt && cur.key[pos].str < x.str){
         if (pos == cur.keycnt - 1){
             if (cur.rbro != -1){cur = disk_read(cur.rbro);pos = 0;}
             else return;
@@ -225,7 +225,7 @@ void Database::find(int nod, const data &x, std::vector<int> &cap) {
 //        cap.push_back(cur.key[pos].pos);
 //        pos++;
 //    }
-    while (cur.key[pos].str == x.str){
+    while (pos < cur.keycnt && cur.key[pos].str == x.str){
         cap.push_back(cur.key[pos].pos);
         if (pos == cur.keycnt - 1){
             if (cur.rbro != -1){

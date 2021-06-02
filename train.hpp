@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <map>
+#include <assert.h>
 
 #include "string.h"
 #include "time.hpp"
@@ -86,11 +86,14 @@ public:
     
     bool direction (const String &fromStation, const String &toStation) const {
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
+        assert (from_id == -1 || stations[from_id] == fromStation) ;
+        assert (to_id == -1 || stations[to_id] == toStation) ;
         return from_id != -1 && to_id != -1 && from_id < to_id ;
     }
 
     Time getStartTime (const Time &date, const String &station) const {
         int stationID = stationHashMap.find (station) ;
+        assert (stations[stationID] == station) ;
         Time res = date ;
         res = res - travelTimesSum[stationID - 1] - stopoverTimesSum[stationID] ;
         Time tmp = res; tmp.setTime (startTime) ;
@@ -100,32 +103,41 @@ public:
 
     Time getStartTimeFromLeavingTime (const Time &time, const String &station) const {
         int stationID = stationHashMap.find (station) ;
+        assert (stations[stationID] == station) ;
         return time - travelTimesSum[stationID - 1] - stopoverTimesSum[stationID] ;
     }
 
     Time getLeavingTime (const Time &startTime, const String &station) const {
         int stationID = stationHashMap.find (station) ;
+        assert (stations[stationID] == station) ;
         return startTime + travelTimesSum[stationID - 1] + stopoverTimesSum[stationID] ;
     }
 
     Time getArrivingTime (const Time &startTime, const String &station) const {
         int stationID = stationHashMap.find (station) ;
+        assert (stations[stationID] == station) ;
         return startTime + travelTimesSum[stationID - 1] + stopoverTimesSum[stationID - 1] ;
     }
 
     int calTravellingTime (const String &fromStation, const String &toStation) const {
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
+        assert (stations[from_id] == fromStation) ;
+        assert (stations[to_id] == toStation) ;
         return travelTimesSum[to_id - 1] + stopoverTimesSum[to_id - 1] - (travelTimesSum[from_id - 1] + stopoverTimesSum[from_id]) ;
     }
 
     int calPrice (const String &fromStation, const String &toStation) const {
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
+        assert (stations[from_id] == fromStation) ;
+        assert (stations[to_id] == toStation) ;
         return priceSum[to_id - 1] - priceSum[from_id - 1] ;
     }
 
     int calSeats (const Time &startTime, const String &fromStation, const String &toStation) const {
         int days = startTime.daysBetweenTime (saleDate[1]) ;
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
+        assert (stations[from_id] == fromStation) ;
+        assert (stations[to_id] == toStation) ;
         int seats = 1e9 ;
         for (int i = from_id; i < to_id; i ++)
             seats = std::min (seats, seat[days][i]) ;
@@ -135,6 +147,8 @@ public:
     void sellSeats (const Time &startTime, const String &fromStation, const String &toStation, const int ticketNum) {
         int days = startTime.daysBetweenTime (saleDate[1]) ;
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
+        assert (stations[from_id] == fromStation) ;
+        assert (stations[to_id] == toStation) ;
         for (int i = from_id; i < to_id; i ++)
             seat[days][i] -= ticketNum ;
     }
@@ -142,6 +156,8 @@ public:
     void addSeats (const Time &startTime, const String &fromStation, const String &toStation, const int ticketNum) {
         int days = startTime.daysBetweenTime (saleDate[1]) ;
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
+        assert (stations[from_id] == fromStation) ;
+        assert (stations[to_id] == toStation) ;
         for (int i = from_id; i < to_id; i ++)
             seat[days][i] += ticketNum ;
     }

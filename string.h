@@ -13,36 +13,30 @@ public:
     int len = 0;//记录字母个数，有一个记一个
 public:
     String(const char *ch){
-        memset (str, 0, sizeof str) ;
-        int i = 0;
-        while (ch[i] != '\0'){
-            str[i] = ch[i];
-            i++;
-        }
-        len = i ;
+        strcpy (str, ch) ;
+        len = strlen (ch); str[len] = '\0' ;
     }
     String(){
         memset(str , 0 , sizeof str);
         len = 0;
     }
     String(const String &ot){
-        memset (str, 0, sizeof str) ;
-        for (int i = 0; i < ot.len; ++i) {
-            str[i] = ot.str[i];
-        }
+        // memset (str, 0, sizeof str) ;
+        // for (int i = 0; i < ot.len; ++i) {
+        //     str[i] = ot.str[i];
+        // }
+        // len = ot.len; str[len] = '\0' ;
+        strcpy (str, ot.str) ;
         len = ot.len; str[len] = '\0' ;
     }
-    ~String(){
-        len = 0;
-        memset(str , 0 , sizeof str);
-    }
+    ~String() {}
     String& operator=(const String &ot){
         if (this == &ot){
             return *this;
         }
-        memset (str, 0, sizeof str) ;
         len = ot.len;
         strcpy (str, ot.str);
+        str[len] = '\0' ;
         return *this;
     }
     String& operator += (const char _c) {
@@ -50,8 +44,9 @@ public:
         return *this ;
     }
     void clear() {
-        memset(str , 0 , sizeof str);
-        len = 0;
+        len = 0; str[len] = '\0' ;
+        // memset(str , 0 , sizeof str);
+        // len = 0;
     }
     bool operator<(const String &ot) const {
         return strcmp(this->str , ot.str) < 0;
@@ -86,8 +81,9 @@ public:
 
     int toInt () const {
         int res = 0 ;
-        for (int i = 0; i < len; i ++)
+        for (int i = 0; i < len; i ++) {
             res = res * 10 + str[i] - '0' ;
+        }
         return res ;
     }
 
@@ -97,12 +93,11 @@ public:
         res.len = r - l + 1 ;
         return res ;
     }
-    int hashit() const {
-        int res = 0;
+    unsigned long long hashit() const {
+        unsigned long long res = 0;
         for (int i = 0; i < len; ++i) {
-            res = (1ll * res * 131 + str[i]) % 91815541;//-64以避免大小写
+            res = res * 13331 + str[i] ;//-64以避免大小写
         }
-        res = (res % 91815541 + 91815541) % 91815541 ;
         return res;
     }
 };
