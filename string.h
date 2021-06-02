@@ -93,6 +93,13 @@ public:
         res.len = r - l + 1 ;
         return res ;
     }
+    int hashit(){
+        int res = 0;
+        for (int i = 0; i < len; ++i) {
+            res = (res + str[i] - 64) % 91815541;//-64以避免大小写
+        }
+        return res;
+    }
 };
 
 #endif //CODE_ST_RING_H

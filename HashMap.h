@@ -8,14 +8,14 @@
 #include <iostream>
 #include "string.h"
 using namespace std;
-int hash_string(String &str){
+int hash_string(String &s){
     int res = 0;
     for (int i = 0; i < str.len; ++i) {
-        res = (res + str[i] - 64) % 91815541;//-64以避免大小写
+        res = (res + s.str[i] - 64) % 91815541;//-64以避免大小写
     }
     return res;
 };
-template<class Key , class Data >//key是站名 ， data是车站内容，即顺序
+//template<class Key , class Data >//key是站名 ， data是车站内容，即顺序
 class HashMap{
 private:
     const int size = 105;
@@ -49,14 +49,14 @@ private:
     }
 public:
     HashMap() = default;
-    void insert(Key key1 , Data data1){
+    void insert(String key1 , int data1){
         pair nod(hash_string(key1) % mod , data1);
         order[++cur] = nod;
     }
     void sort(){
         sort(1 , cur);
     }
-    int find(Key key1){
+    int find(String key1){
         int l = 0;
         int r = cur + 1;
         while (l + 1 < r){
