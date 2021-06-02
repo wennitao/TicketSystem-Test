@@ -102,6 +102,8 @@ public:
                 delete_train () ;
             } else if (strcmp (argument[1], "query_ticket") == 0) {
                 query_ticket () ;
+            } else if (strcmp (argument[1], "query_transfer") == 0) {
+                
             }
         } catch (...) {
             printf("-1\n") ;
@@ -408,6 +410,10 @@ public:
         std::cout << orders.size() << std::endl ;
         for (int i = 0; i < orders.size(); i ++)
             std::cout << orders[i] << std::endl ;
+    }
+
+    void query_transfer () {
+
     }
 
 } ;
