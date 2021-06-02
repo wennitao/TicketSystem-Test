@@ -26,6 +26,7 @@ private:
 
 public:
     CommandHandler (const std::string _op) {
+        std::cout << _op << std::endl ;
         op = _op ;
     }
 
@@ -278,6 +279,7 @@ public:
 
     void split_int (int *res, char *str) {
         int cur_id = 1, len = strlen (str) ;
+        res[cur_id] = 0 ;
         for (int i = 0; i < len; i ++) {
             if (str[i] == '|') {
                 cur_id ++; res[cur_id] = 0 ;
@@ -299,12 +301,12 @@ public:
             else if (argument[i][1] == 'm') seatNum = String (argument[i + 1]).toInt() ;
             else if (argument[i][1] == 's') split_String (stations, argument[i + 1]) ;
             else if (argument[i][1] == 'p') split_int (prices, argument[i + 1]) ;
-            else if (argument[i][1] == 'x') startTime = Time (String ("00-00"), argument[i + 1]) ;
+            else if (argument[i][1] == 'x') startTime = Time (0, argument[i + 1]) ;
             else if (argument[i][1] == 't') split_int (travelTimes, argument[i + 1]) ;
             else if (argument[i][1] == 'o') split_int (stopoverTimes, argument[i + 1]) ;
             else if (argument[i][1] == 'd') {
                 String tmp = String (argument[i + 1]) ;
-                saleDate[1] = Time (tmp.substr (0, 4), String ("00-00")); saleDate[2] = Time (tmp.substr (6, 10), String ("00-00")) ;
+                saleDate[1] = Time (tmp.substr (0, 4), 0); saleDate[2] = Time (tmp.substr (6, 10), 0) ;
             }
             else if (argument[i][1] == 'y') type = argument[i + 1][0] ;
         }
@@ -346,7 +348,7 @@ public:
         Time date ;
         for (int i = 2; i <= key_cnt; i += 2) {
             if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'd') date = Time (argument[i + 1], String ("00:00")) ;
+            else if (argument[i][1] == 'd') date = Time (argument[i + 1], 0) ;
         }
 
         std::vector<int> pos ;
@@ -422,6 +424,7 @@ public:
         int order_cnt = 0 ;
         for (int i = 0; i < possible_trains.size(); i ++) {
             train cur_train = train_read (possible_trains[i]) ;
+            if (!cur_train.isReleased()) continue ;
             if (!cur_train.canDepartFromStationOnDate (date, fromStation)) continue ;
             if (!cur_train.direction (fromStation, toStation)) continue ;
             Time trainStartTime = cur_train.getStartTime (date, fromStation) ;
@@ -472,6 +475,7 @@ public:
         int train_file_pos = pos[0] ;
         train cur_train = train_read (train_file_pos) ;
 
+        if (!cur_train.isReleased()) throw "train not released" ;
         if (!cur_train.canDepartFromStationOnDate (date, fromStation)) throw "cannot depart" ;
         if (!cur_train.direction (fromStation, toStation)) throw "cannot depart" ;
         if (ticketNum > cur_train.getSeatNum()) throw "no enough tickets" ;
@@ -554,14 +558,13 @@ public:
             train cur_train = train_read (train_file_pos) ;
             Time trainStartTime = cur_train.getStartTimeFromLeavingTime (cur_order.getLeavingTime(), cur_order.getFromStation()) ;
             cur_train.addSeats (trainStartTime, cur_order.getFromStation(), cur_order.getToStation(), cur_order.getSeatNum()) ;
-            train_write (train_file_pos, cur_train) ;
 
             tmp.clear() ;
             pendingOrders.find (data (trainID, 0), tmp) ;
             for (int i = 0; i < tmp.size(); i ++) {
                 order pending_order = order_read (tmp[i]) ;
                 Time pending_startTime = cur_train.getStartTimeFromLeavingTime (pending_order.getLeavingTime(), pending_order.getFromStation()) ;
-                if (pending_order.getSeatNum() < cur_train.calSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation())) {
+                if (pending_order.getSeatNum() <= cur_train.calSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation())) {
                     cur_train.sellSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation(), pending_order.getSeatNum()) ;
                     pending_order.setStatus (success) ;
                     order_write (tmp[i], pending_order) ;
@@ -571,6 +574,8 @@ public:
         }
         cur_order.setStatus (refunded) ;
         order_write (order_file_pos, cur_order) ;
+
+        printf("0\n") ;
     }
 
     void clean () {
@@ -580,6 +585,8 @@ public:
         trainStations.clear() ;
         orders.clear() ;
         pendingOrders.clear() ;
+
+        printf("0\n") ;
     }
 } ;
 

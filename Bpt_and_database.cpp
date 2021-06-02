@@ -56,7 +56,13 @@ bool Database::empty() {
     return root == -1 || disk_read (root).keycnt == 0 ;
 }
 void Database::clear() {
+    io.close() ;
     root = -1; nodenum = 0 ;
+    std::fstream out (file_name, std::ios::out | std::ios::binary) ;
+    out.write (reinterpret_cast<char *>(&root), sizeof root) ;
+    out.write (reinterpret_cast<char *>(&nodenum), sizeof nodenum) ;
+    out.close() ;
+    io.open (file_name, std::ios::in | std::ios::out | std::ios::binary) ;
 }
 void Database::insert(const data &x) {
     if (root == -1){

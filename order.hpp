@@ -28,7 +28,7 @@ public:
     }
 
     void print () {
-        std::cout << trainID << " " << fromStation << " " << leavingTime << " -> " << arrivingTime << " " << price << " " << seat << std::endl ;
+        std::cout << trainID << " " << fromStation << " " << leavingTime << " -> " << toStation << " " << arrivingTime << " " << price << " " << seat << std::endl ;
     }
 
     String getTrainID () const {
@@ -69,7 +69,7 @@ public:
 } ;
 
 std::ostream& operator << (std::ostream &out, const order &_order) {
-    out << status_str[_order.status] << " " << _order.trainID << " " << _order.fromStation << " " << _order.leavingTime << " -> " << _order.arrivingTime << " " << _order.price << " " << _order.seat ;
+    out << status_str[_order.status] << " " << _order.trainID << " " << _order.fromStation << " " << _order.leavingTime << " -> " << _order.toStation << " " << _order.arrivingTime << " " << _order.price << " " << _order.seat ;
     return out ;
 }
 

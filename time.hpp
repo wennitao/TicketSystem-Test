@@ -39,14 +39,14 @@ public:
     }
 
     bool operator < (const Time &_time) const {
-        if (m == _time.m && d == _time.d && h == _time.h) return min < _time.h ;
+        if (m == _time.m && d == _time.d && h == _time.h) return min < _time.min ;
         if (m == _time.m && d == _time.d) return h < _time.h ;
         if (m == _time.m) return d < _time.d ;
         return m < _time.m ;
     }
 
     bool operator <= (const Time &_time) const {
-        if (m == _time.m && d == _time.d && h == _time.h) return min <= _time.h ;
+        if (m == _time.m && d == _time.d && h == _time.h) return min <= _time.min ;
         if (m == _time.m && d == _time.d) return h <= _time.h ;
         if (m == _time.m) return d <= _time.d ;
         return m <= _time.m ;

@@ -35,18 +35,18 @@ public:
 
         int days = saleDate[2].daysBetweenTime (saleDate[1]) ;
         for (int i = 0; i <= days; i ++)
-            for (int j = 1; j <= stationNum; j ++)
+            for (int j = 0; j <= stationNum; j ++)
                 seat[i][j] = seatNum ;
 
         priceSum[0] = 0 ;
         for (int i = 1; i < stationNum; i ++)
             priceSum[i] = priceSum[i - 1] + _prices[i] ;
-        
+
         travelTimesSum[0] = 0 ;
         for (int i = 1; i < stationNum; i ++)
             travelTimesSum[i] = travelTimesSum[i - 1] + _travelTimes[i] ;
         
-        stopoverTimesSum[0] = stopoverTimesSum[1] ;
+        stopoverTimesSum[0] = stopoverTimesSum[1] = 0 ;
         for (int i = 2; i < stationNum; i ++)
             stopoverTimesSum[i] = stopoverTimesSum[i - 1] + _stopoverTimes[i - 1] ;
         stopoverTimesSum[stationNum] = stopoverTimesSum[stationNum - 1] ;
@@ -115,7 +115,7 @@ public:
 
     int calTravellingTime (const String &fromStation, const String &toStation) const {
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
-        return travelTimesSum[to_id - 1] + stopoverTimesSum[to_id - 1] - (travelTimesSum[from_id - 1], stopoverTimesSum[from_id]) ;
+        return travelTimesSum[to_id - 1] + stopoverTimesSum[to_id - 1] - (travelTimesSum[from_id - 1] + stopoverTimesSum[from_id]) ;
     }
 
     int calPrice (const String &fromStation, const String &toStation) const {
