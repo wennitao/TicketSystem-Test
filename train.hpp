@@ -62,7 +62,6 @@ public:
     }
 
     void print (const Time &date) const {
-        printf("in\n") ;
         int days = date.daysBetweenTime (saleDate[1]) ;
         Time tim = date ;
         tim.setTime (startTime) ;
