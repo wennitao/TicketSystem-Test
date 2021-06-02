@@ -11,6 +11,7 @@
 class train {
 
 private:
+    bool released ;
     int stationNum, seatNum, prices[110], travelTimes[110], stopoverTimes[110] ;
     char type ;
     string trainID, stations[110] ;
@@ -27,11 +28,18 @@ public:
         for (int i = 1; i < stationNum; i ++) prices[i] = _prices[i] ;
         startTime = _startTime ;
         for (int i = 1; i < stationNum; i ++) travelTimes[i] = _travelTimes[i] ;
-        for (int i = 1; i < stationNum; i ++) stopoverTimes[i] = _stopoverTimes[i] ;
+        for (int i = 2; i < stationNum; i ++) stopoverTimes[i] = _stopoverTimes[i] ;
+        stopoverTimes[0] = stopoverTimes[stationNum] = 0 ;
         saleDate[1] = _saleDate[1]; saleDate[2] = _saleDate[2] ;
+        released = 0 ;
 
         for (int i = 1; i <= stationNum; i ++)
             stationID[stations[i]] = i ;
+    }
+
+    void release () {
+        if (released) throw "already released" ;
+        released = 1 ;
     }
 
 } ;
