@@ -2,6 +2,7 @@
 *.out
 *.dat
 *.ans
+*.o
 data/*
 build/*
 CMakeFiles/*
