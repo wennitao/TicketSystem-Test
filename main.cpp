@@ -9,7 +9,7 @@ Database users ("users_B+Tree.dat") ;
 Database curUsers ("curUsers.dat") ;
 Database trains ("trains_B+Tree.dat") ;
 
-std::fstream userio ;
+std::fstream userio, trainio ;
 
 void init () {
     std::fstream in ("users.dat", std::ios::in | std::ios::binary) ;

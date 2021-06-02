@@ -311,6 +311,10 @@ public:
         sjtu::vector<int> pos ;
         trains.find (data (trainID, 0), pos) ;
         if (pos.empty()) throw "train not found" ;
+        int train_file_pos = pos[0] ;
+        train cur_train = train_read (train_file_pos) ;
+        if (!cur_train.runningOnDate (date)) throw "train doesn't run on this date" ;
+        cur_train.print (date) ;
     }
 } ;
 
