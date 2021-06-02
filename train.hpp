@@ -70,6 +70,10 @@ public:
         return released ;
     }
 
+    int getSeatNum () const {
+        return seatNum ;
+    }
+
     bool runningOnDate (const Time &date) const {
         return saleDate[1] <= date && date <= saleDate[2] ;
     }
@@ -92,6 +96,11 @@ public:
         Time tmp = res; tmp.setTime (startTime) ;
         if (tmp < res) tmp = tmp + 1440 ;
         return tmp ;
+    }
+
+    Time getStartTimeFromLeavingTime (const Time &time, const String &station) const {
+        int stationID = stationHashMap.find (station) ;
+        return time - travelTimesSum[stationID - 1] - stopoverTimesSum[stationID] ;
     }
 
     Time getLeavingTime (const Time &startTime, const String &station) const {
@@ -121,6 +130,20 @@ public:
         for (int i = from_id; i < to_id; i ++)
             seats = std::min (seats, seat[days][i]) ;
         return seats ;
+    }
+
+    void sellSeats (const Time &startTime, const String &fromStation, const String &toStation, const int ticketNum) {
+        int days = startTime.daysBetweenTime (saleDate[1]) ;
+        int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
+        for (int i = from_id; i < to_id; i ++)
+            seat[days][i] -= ticketNum ;
+    }
+
+    void addSeats (const Time &startTime, const String &fromStation, const String &toStation, const int ticketNum) {
+        int days = startTime.daysBetweenTime (saleDate[1]) ;
+        int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
+        for (int i = from_id; i < to_id; i ++)
+            seat[days][i] += ticketNum ;
     }
 
     void print (const Time &date) const {

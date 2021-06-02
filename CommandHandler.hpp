@@ -79,6 +79,25 @@ public:
         trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
     }
 
+    order order_read (int pos) {
+        orderio.seekg (pos, std::ios::beg) ;
+        order cur ;
+        orderio.read (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+        return cur ;
+    }
+
+    int order_write (order &cur) {
+        orderio.seekp (0, std::ios::end) ;
+        int pos = orderio.tellp() ;
+        orderio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+        return pos ;
+    }
+
+    void order_write (int pos, order &cur) {
+        orderio.seekp (pos, std::ios::beg) ;
+        orderio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+    }
+
     void run () {
         try {
             analyze () ;
@@ -106,6 +125,12 @@ public:
                 query_transfer () ;
             } else if (strcmp (argument[1], "buy_ticket") == 0) {
                 buy_ticket () ;
+            } else if (strcmp (argument[1], "query_order") == 0) {
+                query_order () ;
+            } else if (strcmp (argument[1], "refund_ticket") == 0) {
+                refund_ticket () ;
+            } else if (strcmp (argument[1], "clean") == 0) {
+                clean() ;
             }
         } catch (...) {
             printf("-1\n") ;
@@ -413,7 +438,7 @@ public:
 
         std::cout << orders.size() << std::endl ;
         for (int i = 0; i < orders.size(); i ++)
-            std::cout << orders[i] << std::endl ;
+            orders[i].print() ;
     }
 
     void query_transfer () {
@@ -449,8 +474,113 @@ public:
 
         if (!cur_train.canDepartFromStationOnDate (date, fromStation)) throw "cannot depart" ;
         if (!cur_train.direction (fromStation, toStation)) throw "cannot depart" ;
+        if (ticketNum > cur_train.getSeatNum()) throw "no enough tickets" ;
+
+        Time trainStartTime = cur_train.getStartTime (date, fromStation) ;
+        int remainingSeats = cur_train.calSeats (trainStartTime, fromStation, toStation) ;
+        
+        if (!queue && remainingSeats < ticketNum) throw "no enough tickets" ;
+
+        order cur_order = order (trainID, fromStation, toStation, 
+        cur_train.getLeavingTime (trainStartTime, fromStation), 
+        cur_train.getArrivingTime (trainStartTime, toStation), 
+        cur_train.calPrice (fromStation, toStation), ticketNum, 
+        cur_train.calTravellingTime (fromStation, toStation)) ;
+
+        if (remainingSeats >= ticketNum) {
+            cur_order.setStatus (success) ;
+            cur_train.sellSeats (trainStartTime, fromStation, toStation, ticketNum) ;
+            int order_file_pos = order_write (cur_order) ;
+            orders.insert (data (username, order_file_pos)) ;
+            printf("%lld\n", 1ll * ticketNum * cur_train.calPrice (fromStation, toStation)) ;
+        } else {
+            cur_order.setStatus (pending) ;
+            int order_file_pos = order_write (cur_order) ;
+            orders.insert (data (username, order_file_pos)) ;
+            pendingOrders.insert (data (trainID, order_file_pos)) ;
+            printf("queue\n") ;
+        }
+
+        train_write (train_file_pos, cur_train) ;
     }
 
+    void query_order () {
+        String username ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+        }
+
+        std::vector<int> pos ;
+        curUsers.find (data (username, 0), pos) ;
+        if (pos.empty()) throw "user not logged in" ;
+
+        pos.clear() ;
+        orders.find (data (username, 0), pos) ;
+        std::reverse (pos.begin(), pos.end()) ;
+        std::cout << pos.size() << std::endl ;
+        for (int i = 0; i < pos.size(); i ++) {
+            order cur_order = order_read (pos[i]) ;
+            std::cout << cur_order << std::endl ;
+        }
+    }
+
+    void refund_ticket () {
+        String username ;
+        int num = 1 ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'n') num = String (argument[i + 1]).toInt() ;
+        }
+
+        std::vector<int> pos ;
+        curUsers.find (data (username, 0), pos) ;
+        if (pos.empty()) throw "user not logged in" ;
+
+        pos.clear() ;
+        orders.find (data (username, 0), pos) ;
+        if (pos.size() < num) throw "no nth order" ;
+        std::reverse (pos.begin(), pos.end()) ;
+        int order_file_pos = pos[num - 1] ;
+        order cur_order = order_read (pos[num - 1]) ;
+        if (cur_order.getStatus() == refunded) throw "cannot refund" ;
+
+        String trainID = cur_order.getTrainID() ;
+        if (cur_order.getStatus() == pending) {
+            pendingOrders.erase (data (trainID, order_file_pos)) ;
+        } else {
+            std::vector<int> tmp ;
+            trains.find (data (trainID, 0), tmp) ;
+            int train_file_pos = tmp[0] ;
+            train cur_train = train_read (train_file_pos) ;
+            Time trainStartTime = cur_train.getStartTimeFromLeavingTime (cur_order.getLeavingTime(), cur_order.getFromStation()) ;
+            cur_train.addSeats (trainStartTime, cur_order.getFromStation(), cur_order.getToStation(), cur_order.getSeatNum()) ;
+            train_write (train_file_pos, cur_train) ;
+
+            tmp.clear() ;
+            pendingOrders.find (data (trainID, 0), tmp) ;
+            for (int i = 0; i < tmp.size(); i ++) {
+                order pending_order = order_read (tmp[i]) ;
+                Time pending_startTime = cur_train.getStartTimeFromLeavingTime (pending_order.getLeavingTime(), pending_order.getFromStation()) ;
+                if (pending_order.getSeatNum() < cur_train.calSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation())) {
+                    cur_train.sellSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation(), pending_order.getSeatNum()) ;
+                    pending_order.setStatus (success) ;
+                    order_write (tmp[i], pending_order) ;
+                }
+            }
+            train_write (train_file_pos, cur_train) ;
+        }
+        cur_order.setStatus (refunded) ;
+        order_write (order_file_pos, cur_order) ;
+    }
+
+    void clean () {
+        users.clear() ;
+        curUsers.clear() ;
+        trains.clear() ;
+        trainStations.clear() ;
+        orders.clear() ;
+        pendingOrders.clear() ;
+    }
 } ;
 
 #endif

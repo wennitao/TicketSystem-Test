@@ -10,8 +10,9 @@ Database curUsers ("curUsers.dat") ;
 Database trains ("trains_B+Tree.dat") ;
 Database trainStations ("trainStations.dat") ;
 Database orders ("orders_B+Tree.dat") ;
+Database pendingOrders ("pendingOrders.dat") ;
 
-std::fstream userio, trainio ;
+std::fstream userio, trainio, orderio ;
 
 void init () {
     std::fstream in ("users.dat", std::ios::in | std::ios::binary) ;
@@ -33,6 +34,16 @@ void init () {
     }
     in.close() ;
     if (!trainio.is_open()) trainio.open ("trains.dat", std::ios::in | std::ios::out | std::ios::binary) ;
+
+    in.open ("orders.dat", std::ios::in | std::ios::binary) ;
+    if (!in.is_open()) {
+        std::fstream out ("orders.dat", std::ios::out | std::ios::binary) ;
+        out.close() ;
+        orderio.open ("orders.dat", std::ios::in | std::ios::out | std::ios::binary) ;
+        orderio.seekp (0, std::ios::end) ;
+    }
+    in.close() ;
+    if (!orderio.is_open()) orderio.open ("orders.dat", std::ios::in | std::ios::out | std::ios::binary) ;
 }
 
 int main() {

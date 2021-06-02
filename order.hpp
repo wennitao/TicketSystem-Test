@@ -6,6 +6,7 @@
 #include "string.h"
 
 enum Status {success, pending, refunded} ;
+const char status_str[3][20] = {"[success]", "[pending]", "[refunded]"} ;
 
 class order {
 
@@ -26,8 +27,28 @@ public:
         price = _price; seat = _seat; travellingTime = _travellingTime ;
     }
 
+    void print () {
+        std::cout << trainID << " " << fromStation << " " << leavingTime << " -> " << arrivingTime << " " << price << " " << seat << std::endl ;
+    }
+
     String getTrainID () const {
         return trainID ;
+    }
+
+    Status getStatus () const {
+        return status ;
+    }
+
+    Time getLeavingTime () const {
+        return leavingTime ;
+    }
+
+    String getFromStation () const {
+        return fromStation ;
+    }
+
+    String getToStation () const {
+        return toStation ;
     }
 
     int getTravellingTime () const {
@@ -37,10 +58,18 @@ public:
     int getPrice () const {
         return price ;
     }
+
+    int getSeatNum () const {
+        return seat ;
+    }
+
+    void setStatus (Status _status) {
+        status = _status ;
+    }
 } ;
 
 std::ostream& operator << (std::ostream &out, const order &_order) {
-    out << _order.trainID << " " << _order.fromStation << " " << _order.leavingTime << " -> " << _order.arrivingTime << " " << _order.price << " " << _order.seat ;
+    out << status_str[_order.status] << " " << _order.trainID << " " << _order.fromStation << " " << _order.leavingTime << " -> " << _order.arrivingTime << " " << _order.price << " " << _order.seat ;
     return out ;
 }
 
