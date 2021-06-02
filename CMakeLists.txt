@@ -3,4 +3,4 @@ project(code)
 
 set(CXX_FLAGS -std=c++11 -fsanitize=address -fsanitize=undefined)
 
-add_executable(code main.cpp data.hpp string.cpp user.hpp vector.h Bpt_and_database.cpp)
+add_executable(code main.cpp data.hpp string.cpp user.hpp vector.h Bpt_and_database.cpp HashMap.h)
