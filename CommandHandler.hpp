@@ -94,6 +94,8 @@ public:
                 add_train () ;
             } else if (strcmp (argument[1], "release_train") == 0) {
                 release_train() ;
+            } else if (strcmp (argument[1], "query_train") == 0) {
+                query_train () ;
             }
         } catch (...) {
             printf("-1\n") ;
@@ -294,10 +296,21 @@ public:
         train cur_train = train_read (train_file_pos) ;
         cur_train.release() ;
         train_write (train_file_pos, cur_train) ;
+
+        printf("0\n") ;
     }
 
     void query_train () {
-        
+        string trainID ;
+        Time date ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'i') trainID = string (argument[i + 1]) ;
+            else if (argument[i][1] == 'd') date = Time (argument[i + 1], string ("00:00")) ;
+        }
+
+        sjtu::vector<int> pos ;
+        trains.find (data (trainID, 0), pos) ;
+        if (pos.empty()) throw "train not found" ;
     }
 } ;
 
