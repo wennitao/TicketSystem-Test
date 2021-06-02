@@ -103,7 +103,9 @@ public:
             } else if (strcmp (argument[1], "query_ticket") == 0) {
                 query_ticket () ;
             } else if (strcmp (argument[1], "query_transfer") == 0) {
-
+                query_transfer () ;
+            } else if (strcmp (argument[1], "buy_ticket") == 0) {
+                buy_ticket () ;
             }
         } catch (...) {
             printf("-1\n") ;
@@ -236,15 +238,17 @@ public:
 
     void split_String (String *res, char *str) {
         int cur_id = 1, cur_len = 0, len = strlen (str) ;
+        String tmp ;
         for (int i = 0; i < len; i ++) {
             if (str[i] == '|') {
-                res[cur_id][cur_len ++] = 0 ;
+                res[cur_id] = tmp ;
+                tmp.clear() ;
                 cur_id ++, cur_len = 0 ;
             } else {
-                res[cur_id][cur_len ++] = str[i] ;
+                tmp += str[i] ;
             }
         }
-        res[cur_id][cur_len ++] = 0 ;
+        res[cur_id] = tmp ;
     }
 
     void split_int (int *res, char *str) {
@@ -346,12 +350,12 @@ public:
         printf("0\n") ; 
     }
 
-    bool cmp_time (const order &a, const order &b) {
+    static bool cmp_time (const order &a, const order &b) {
         if (a.getTravellingTime() == b.getTravellingTime()) return a.getTrainID() < b.getTrainID() ;
         return a.getTravellingTime() < b.getTravellingTime() ;
     }
 
-    bool cmp_cost (const order &a, const order &b) {
+    static bool cmp_cost (const order &a, const order &b) {
         if (a.getPrice() == b.getPrice()) return a.getTrainID() < b.getTrainID() ;
         return a.getPrice() < b.getPrice() ;
     }
@@ -393,14 +397,14 @@ public:
         int order_cnt = 0 ;
         for (int i = 0; i < possible_trains.size(); i ++) {
             train cur_train = train_read (possible_trains[i]) ;
-            if (!cur_train.canDepartOnDate (date)) continue ;
+            if (!cur_train.canDepartFromStationOnDate (date, fromStation)) continue ;
             if (!cur_train.direction (fromStation, toStation)) continue ;
             Time trainStartTime = cur_train.getStartTime (date, fromStation) ;
             orders.push_back (order (cur_train.getTrainID(), fromStation, toStation, 
             cur_train.getLeavingTime (trainStartTime, fromStation), 
             cur_train.getArrivingTime (trainStartTime, toStation), 
             cur_train.calPrice (fromStation, toStation), 
-            cur_train.calSeats (fromStation, toStation), 
+            cur_train.calSeats (trainStartTime, fromStation, toStation), 
             cur_train.calTravellingTime (fromStation, toStation))) ;
         }
 
@@ -413,7 +417,38 @@ public:
     }
 
     void query_transfer () {
-        
+        printf("0\n") ;
+    }
+
+    void buy_ticket () {
+        String username, trainID, fromStation, toStation ;
+        Time date ;
+        int ticketNum ;
+        bool queue = 0 ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'd') date = Time (String (argument[i + 1]), 0) ;
+            else if (argument[i][1] == 'n') ticketNum = String (argument[i + 1]).toInt() ;
+            else if (argument[i][1] == 'f') fromStation = String (argument[i + 1]) ;
+            else if (argument[i][1] == 't') toStation = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'q') queue = String (argument[i + 1]) == String ("false") ? 0 : 1 ;
+        }
+
+        std::vector<int> pos ;
+        curUsers.find (data (username, 0), pos) ;
+        if (pos.empty()) throw "user not logged in" ;
+        int user_file_pos = pos[0] ;
+        user cur_user = user_read (user_file_pos) ;
+
+        pos.clear() ;
+        trains.find (data (trainID, 0), pos) ;
+        if (pos.empty()) throw "train not found" ;
+        int train_file_pos = pos[0] ;
+        train cur_train = train_read (train_file_pos) ;
+
+        if (!cur_train.canDepartFromStationOnDate (date, fromStation)) throw "cannot depart" ;
+        if (!cur_train.direction (fromStation, toStation)) throw "cannot depart" ;
     }
 
 } ;

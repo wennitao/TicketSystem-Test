@@ -15,12 +15,19 @@ struct data {
         str = String (_str) ;
         pos = p ;
     }
-    data (const String _str, int p) {
+    data (const String &_str, int p) {
+        // std::cout << _str << std::endl ;
         str = _str; pos = p ;
     }
-    // void print() const {
-    //     std::cout << str << " " << pos << std::endl ;
-    // }
+
+    data& operator = (const data &_data) {
+        if (this == &_data) return *this ;
+        str = _data.str; pos = _data.pos ;
+        return *this ;
+    }
+    void print() const {
+        std::cout << str << " " << pos << std::endl ;
+    }
     bool operator < (const data &a) const {
         if (str == a.str) return pos < a.pos ;
         return str < a.str ;

@@ -30,7 +30,7 @@ public:
         for (int i = 0; i < ot.len; ++i) {
             str[i] = ot.str[i];
         }
-        len = ot.len; str[len] = 0 ;
+        len = ot.len; str[len] = '\0' ;
     }
     ~String(){
         len = 0;
@@ -44,6 +44,10 @@ public:
         len = ot.len;
         strcpy (str, ot.str);
         return *this;
+    }
+    String& operator += (const char _c) {
+        str[len ++] = _c; str[len] = 0 ;
+        return *this ;
     }
     void clear() {
         memset(str , 0 , sizeof str);
@@ -87,17 +91,18 @@ public:
         return res ;
     }
 
-    String substr (int l, int r) {
+    String substr (int l, int r) const {
         String res ;
         for (int i = l; i <= r; i ++) res.str[i - l] = str[i] ;
         res.len = r - l + 1 ;
         return res ;
     }
-    int hashit(){
+    int hashit() const {
         int res = 0;
         for (int i = 0; i < len; ++i) {
-            res = (res + str[i] - 64) % 91815541;//-64以避免大小写
+            res = (1ll * res * 131 + str[i]) % 91815541;//-64以避免大小写
         }
+        res = (res % 91815541 + 91815541) % 91815541 ;
         return res;
     }
 };

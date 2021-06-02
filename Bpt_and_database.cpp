@@ -12,7 +12,7 @@
 #include "vector.h"
 #include "data.hpp"
 //using std::vector;
-void insert_sort(data *a , int num , data Isert){//二分法插入排序
+void insert_sort(data *a , int num , const data &Isert){//二分法插入排序
     int l = 0;
     int r = num - 1;
     while (l <= r){
@@ -25,6 +25,7 @@ void insert_sort(data *a , int num , data Isert){//二分法插入排序
     }
     a[l] = Isert;
 }
+// using namespace std;
 // void Database::node::print() {
 //     cout << "is_leaf: " << is_leaf << " keycnt: " << keycnt << " fa: " << fa << endl << "son: ";
 //     for (int i = 0; i <= size; ++i) {

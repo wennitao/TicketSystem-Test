@@ -6,6 +6,7 @@ extern Database users ;
 extern Database curUsers ;
 extern Database trains ;
 extern Database trainStations ;
+extern Database orders ;
 
 extern std::fstream userio ;
 extern std::fstream trainio ;

@@ -9,6 +9,7 @@ Database users ("users_B+Tree.dat") ;
 Database curUsers ("curUsers.dat") ;
 Database trains ("trains_B+Tree.dat") ;
 Database trainStations ("trainStations.dat") ;
+Database orders ("orders_B+Tree.dat") ;
 
 std::fstream userio, trainio ;
 
