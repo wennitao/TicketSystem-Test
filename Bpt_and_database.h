@@ -73,10 +73,10 @@ public:
     void disk_write(int pos , node &x);
     void update_root();
     std::pair<int , int> find(int nod , const data &x);
-    void find(int nod , const data &x , std::vector<int> &cap);
+    void find(int nod , const data &x , sjtu::vector<int> &cap);
     std::pair<int , int> find(const data &x);
     int findKey(const data &x);
-    void find (const data &x , std::vector<int>&cap);
+    void find (const data &x , sjtu::vector<int>&cap);
     int search(int nod , const data &x);//return where can we insert x
     void update_son_fa(int son , int pa);
     void insert(int &pa , int lchild , int rchild , const data &x);
