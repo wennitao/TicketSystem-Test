@@ -68,6 +68,14 @@ public:
         return strcmp(this->str , ot.str) >= 0;
     }
 
+    char operator [] (const int id) const {
+        return str[id] ;
+    }
+
+    char& operator [] (const int id) {
+        return str[id] ;
+    }
+
     bool empty () const {
         return len == 0 ;
     }
@@ -76,6 +84,13 @@ public:
         int res = 0 ;
         for (int i = 0; i < len; i ++)
             res = res * 10 + str[i] - '0' ;
+        return res ;
+    }
+
+    string substr (int l, int r) {
+        string res ;
+        for (int i = l; i <= r; i ++) res.str[i - l] = str[i] ;
+        res.len = r - l + 1 ;
         return res ;
     }
 };

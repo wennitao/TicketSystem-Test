@@ -13,6 +13,8 @@
 #include "vector.h"
 
 #include "user.hpp"
+#include "train.hpp"
+#include "time.hpp"
 
 class CommandHandler {
 private:
@@ -69,6 +71,8 @@ public:
                 query_profile () ;
             } else if (strcmp (argument[1], "modify_profile") == 0) {
                 modify_profile () ;
+            } else if (strcmp (argument[1], "add_train") == 0) {
+                add_train () ;
             }
         } catch (...) {
             printf("-1\n") ;
@@ -199,7 +203,54 @@ public:
         std::cout << modify_user << std::endl ;
     }
 
-    
+    void split_string (string *res, char *str) {
+        int cur_id = 1, cur_len = 0, len = strlen (str) ;
+        for (int i = 0; i < len; i ++) {
+            if (str[i] == '|') {
+                res[cur_id][cur_len ++] = 0 ;
+                cur_id ++, cur_len = 0 ;
+            } else {
+                res[cur_id][cur_len ++] = str[i] ;
+            }
+        }
+        res[cur_id][cur_len ++] = 0 ;
+    }
+
+    void split_int (int *res, char *str) {
+        int cur_id = 1, len = strlen (str) ;
+        for (int i = 0; i < len; i ++) {
+            if (str[i] == '|') {
+                cur_id ++; res[cur_id] = 0 ;
+            } else {
+                res[cur_id] = res[cur_id] * 10 + str[i] - '0' ;
+            }
+        }
+    }
+
+    void add_train() {
+        int stationNum, seatNum, prices[110], travelTimes[110], stopovertimes[110] ;
+        string trainID, stations[110] ;
+        char type ;
+        Time startTime, saleDate[3] ;
+
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'i') trainID = string (argument[i + 1]) ;
+            else if (argument[i][1] == 'n') stationNum = string (argument[i + 1]).toInt() ;
+            else if (argument[i][1] == 'm') seatNum = string (argument[i + 1]).toInt() ;
+            else if (argument[i][1] == 's') split_string (stations, argument[i + 1]) ;
+            else if (argument[i][1] == 'p') split_int (prices, argument[i + 1]) ;
+            else if (argument[i][1] == 'x') startTime = Time (string ("00-00"), argument[i + 1]) ;
+            else if (argument[i][1] == 't') split_int (travelTimes, argument[i + 1]) ;
+            else if (argument[i][1] == 'o') split_int (stopovertimes, argument[i + 1]) ;
+            else if (argument[i][1] == 'd') {
+                string tmp = string (argument[i + 1]) ;
+                saleDate[1] = Time (tmp.substr (0, 4), string ("00-00")); saleDate[2] = Time (tmp.substr (6, 10), string ("00-00")) ;
+            }
+            else if (argument[i][1] == 'y') type = argument[i + 1][0] ;
+        }
+
+
+    }
 
 } ;
 
