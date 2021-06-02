@@ -1,7 +1,3 @@
-//
-// Created by 罗皓天 on 2021/6/1.
-//
-
 #ifndef CODE_ST_RING_H
 #define CODE_ST_RING_H
 
