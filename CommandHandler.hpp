@@ -344,6 +344,16 @@ public:
         printf("0\n") ; 
     }
 
+    bool cmp_time (const order &a, const order &b) {
+        if (a.getTravellingTime() == b.getTravellingTime()) return a.getTrainID() < b.getTrainID() ;
+        return a.getTravellingTime() < b.getTravellingTime() ;
+    }
+
+    bool cmp_cost (const order &a, const order &b) {
+        if (a.getPrice() == b.getPrice()) return a.getTrainID() < b.getTrainID() ;
+        return a.getPrice() < b.getPrice() ;
+    }
+
     void query_ticket () {
         String fromStation, toStation ;
         Time date ;
@@ -377,13 +387,27 @@ public:
             printf("0\n"); return ;
         }
 
-        order *orders = new order[possible_trains.size()] ;
-        int order_cnt ;
+        std::vector<order> orders ;
+        int order_cnt = 0 ;
         for (int i = 0; i < possible_trains.size(); i ++) {
             train cur_train = train_read (possible_trains[i]) ;
             if (!cur_train.canDepartOnDate (date)) continue ;
             if (!cur_train.direction (fromStation, toStation)) continue ;
+            Time trainStartTime = cur_train.getStartTime (date, fromStation) ;
+            orders.push_back (order (cur_train.getTrainID(), fromStation, toStation, 
+            cur_train.getLeavingTime (trainStartTime, fromStation), 
+            cur_train.getArrivingTime (trainStartTime, toStation), 
+            cur_train.calPrice (fromStation, toStation), 
+            cur_train.calSeats (fromStation, toStation), 
+            cur_train.calTravellingTime (fromStation, toStation))) ;
         }
+
+        if (priority == 0) sort (orders.begin(), orders.end(), cmp_time) ;
+        else sort (orders.begin(), orders.end(), cmp_cost) ;
+
+        std::cout << orders.size() << std::endl ;
+        for (int i = 0; i < orders.size(); i ++)
+            std::cout << orders[i] << std::endl ;
     }
 
 } ;

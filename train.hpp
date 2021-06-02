@@ -19,7 +19,7 @@ private:
     String trainID, stations[110] ;
     Time startTime, saleDate[3] ;
 
-    HashMap<String, int> stationHashMap ;
+    // HashMap<String, int> stationHashMap ;
 
 public:
     train () {}
@@ -51,8 +51,12 @@ public:
             stopoverTimesSum[i] = stopoverTimesSum[i - 1] + _stopoverTimes[i - 1] ;
         stopoverTimesSum[stationNum] = stopoverTimesSum[stationNum - 1] ;
 
-        for (int i = 1; i <= stationNum; i ++)
-            stationHashMap.insert (stations[i], i) ;
+        // for (int i = 1; i <= stationNum; i ++)
+        //     stationHashMap.insert (stations[i], i) ;
+    }
+
+    String getTrainID () const {
+        return trainID ;
     }
 
     void release () {
@@ -72,7 +76,31 @@ public:
         return 0 ;
     }
     
-    bool direction (const String &fromStation, const String &toStation) {
+    bool direction (const String &fromStation, const String &toStation) const {
+
+    }
+
+    Time getStartTime (const Time &date, const String &station) const {
+
+    }
+
+    Time getLeavingTime (const Time &time, const String &station) const {
+
+    }
+
+    Time getArrivingTime (const Time &time, const String &station) const {
+
+    }
+
+    int calTravellingTime (const String &fromStation, const String &toStation) const {
+        
+    }
+
+    int calPrice (const String &fromStation, const String &toStation) const {
+
+    }
+
+    int calSeats (const String &fromStation, const String &toStation) const {
 
     }
 
