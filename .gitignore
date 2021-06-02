@@ -6,6 +6,6 @@ data/*
 build/*
 CMakeFiles/*
 *.cmake
-CmakeCache.txt
+CMakeCache.txt
 Makefile
 output.txt
