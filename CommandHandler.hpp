@@ -13,6 +13,8 @@
 #include "vector.h"
 
 #include "user.hpp"
+#include "train.hpp"
+#include "time.hpp"
 
 class CommandHandler {
 private:
@@ -56,6 +58,25 @@ public:
         userio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
     }
 
+    train train_read (int pos) {
+        trainio.seekg (pos, std::ios::beg) ;
+        train cur ;
+        trainio.read (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+        return cur ;
+    }
+
+    int train_write (train &cur) {
+        trainio.seekp (0, std::ios::end) ;
+        int pos = trainio.tellp() ;
+        trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+        return pos ;
+    }
+
+    void train_write (int pos, train &cur) {
+        trainio.seekp (pos, std::ios::beg) ;
+        trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+    }
+
     void run () {
         try {
             analyze () ;
@@ -69,6 +90,10 @@ public:
                 query_profile () ;
             } else if (strcmp (argument[1], "modify_profile") == 0) {
                 modify_profile () ;
+            } else if (strcmp (argument[1], "add_train") == 0) {
+                add_train () ;
+            } else if (strcmp (argument[1], "release_train") == 0) {
+                release_train() ;
             }
         } catch (...) {
             printf("-1\n") ;
@@ -199,8 +224,81 @@ public:
         std::cout << modify_user << std::endl ;
     }
 
-    
+    void split_string (string *res, char *str) {
+        int cur_id = 1, cur_len = 0, len = strlen (str) ;
+        for (int i = 0; i < len; i ++) {
+            if (str[i] == '|') {
+                res[cur_id][cur_len ++] = 0 ;
+                cur_id ++, cur_len = 0 ;
+            } else {
+                res[cur_id][cur_len ++] = str[i] ;
+            }
+        }
+        res[cur_id][cur_len ++] = 0 ;
+    }
 
+    void split_int (int *res, char *str) {
+        int cur_id = 1, len = strlen (str) ;
+        for (int i = 0; i < len; i ++) {
+            if (str[i] == '|') {
+                cur_id ++; res[cur_id] = 0 ;
+            } else {
+                res[cur_id] = res[cur_id] * 10 + str[i] - '0' ;
+            }
+        }
+    }
+
+    void add_train() {
+        int stationNum, seatNum, prices[110], travelTimes[110], stopoverTimes[110] ;
+        string trainID, stations[110] ;
+        char type ;
+        Time startTime, saleDate[3] ;
+
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'i') trainID = string (argument[i + 1]) ;
+            else if (argument[i][1] == 'n') stationNum = string (argument[i + 1]).toInt() ;
+            else if (argument[i][1] == 'm') seatNum = string (argument[i + 1]).toInt() ;
+            else if (argument[i][1] == 's') split_string (stations, argument[i + 1]) ;
+            else if (argument[i][1] == 'p') split_int (prices, argument[i + 1]) ;
+            else if (argument[i][1] == 'x') startTime = Time (string ("00-00"), argument[i + 1]) ;
+            else if (argument[i][1] == 't') split_int (travelTimes, argument[i + 1]) ;
+            else if (argument[i][1] == 'o') split_int (stopoverTimes, argument[i + 1]) ;
+            else if (argument[i][1] == 'd') {
+                string tmp = string (argument[i + 1]) ;
+                saleDate[1] = Time (tmp.substr (0, 4), string ("00-00")); saleDate[2] = Time (tmp.substr (6, 10), string ("00-00")) ;
+            }
+            else if (argument[i][1] == 'y') type = argument[i + 1][0] ;
+        }
+
+        sjtu::vector<int> pos ;
+        trains.find (data (trainID, 0), pos) ;
+        if (!pos.empty()) throw "train already exists" ;
+        
+        train new_train = train (trainID, stationNum, stations, seatNum, prices, startTime, travelTimes, stopoverTimes, saleDate, type) ;
+        int train_file_pos = train_write (new_train) ;
+        trains.insert (data (trainID, train_file_pos)) ;
+
+        printf("0\n") ;
+    }
+
+    void release_train () {
+        string trainID ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'i') trainID = string (argument[i + 1]) ;
+        }
+
+        sjtu::vector<int> pos ;
+        trains.find (data (trainID, 0), pos) ;
+        if (pos.empty()) throw "train not found" ;
+        int train_file_pos = pos[0] ;
+        train cur_train = train_read (train_file_pos) ;
+        cur_train.release() ;
+        train_write (train_file_pos, cur_train) ;
+    }
+
+    void query_train () {
+        
+    }
 } ;
 
 #endif

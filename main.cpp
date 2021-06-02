@@ -7,6 +7,7 @@
 
 Database users ("users_B+Tree.dat") ;
 Database curUsers ("curUsers.dat") ;
+Database trains ("trains_B+Tree.dat") ;
 
 std::fstream userio ;
 
@@ -20,6 +21,16 @@ void init () {
     }
     in.close() ;
     if (!userio.is_open()) userio.open ("users.dat", std::ios::in | std::ios::out | std::ios::binary) ;
+
+    in.open ("trains.dat", std::ios::in | std::ios::binary) ;
+    if (!in.is_open()) {
+        std::fstream out ("trains.dat", std::ios::out | std::ios::binary) ;
+        out.close() ;
+        trainio.open ("trains.dat", std::ios::in | std::ios::out | std::ios::binary) ;
+        trainio.seekp (0, std::ios::end) ;
+    }
+    in.close() ;
+    if (!trainio.is_open()) trainio.open ("trains.dat", std::ios::in | std::ios::out | std::ios::binary) ;
 }
 
 int main() {

@@ -4,5 +4,7 @@
 
 extern Database users ;
 extern Database curUsers ;
+extern Database trains ;
 
 extern std::fstream userio ;
+extern std::fstream trainio ;
