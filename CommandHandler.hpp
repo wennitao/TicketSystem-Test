@@ -117,7 +117,7 @@ public:
         if (users.empty()) {
             privilege = 10 ;
         } else {
-            sjtu::vector<int> pos ;
+            std::vector<int> pos ;
             curUsers.find (data (cur_username, 0), pos) ;
             if (pos.empty()) throw "cur user not logged in" ;
 
@@ -125,7 +125,7 @@ public:
             if (cur_user.getPrivilege() <= privilege) throw "invalid privilege" ;
         }
 
-        sjtu::vector<int> pos ;
+        std::vector<int> pos ;
         users.find (data (username, 0), pos) ;
         if (!pos.empty()) throw "user already exists" ;
         user new_user = user (username, password, name, mailAddr, privilege) ;
@@ -141,7 +141,7 @@ public:
             else if (argument[i][1] == 'p') password = string (argument[i + 1]) ;
         }
 
-        sjtu::vector<int> pos ;
+        std::vector<int> pos ;
         curUsers.find (data (username, 0), pos) ;
         if (!pos.empty()) throw "already logged in" ;
         users.find (data (username, 0), pos) ;
@@ -159,7 +159,7 @@ public:
         for (int i = 2; i <= key_cnt; i += 2) {
             if (argument[i][1] == 'u') username = string (argument[i + 1]) ;
         }
-        sjtu::vector<int> pos ;
+        std::vector<int> pos ;
         curUsers.find (data (username, 0), pos) ;
         if (pos.empty()) throw "cur user not logged in" ;
         int user_file_pos = pos[0] ;
@@ -174,7 +174,7 @@ public:
             else if (argument[i][1] == 'u') username = string (argument[i + 1]) ;
         }
 
-        sjtu::vector<int> pos ;
+        std::vector<int> pos ;
         curUsers.find (data (cur_username, 0), pos) ;
         if (pos.empty()) throw "cur user not logged in" ;
         int cur_user_file_pos = pos[0] ;
@@ -202,7 +202,7 @@ public:
             else if (argument[i][1] == 'g') privilege = string (argument[i + 1]).toInt() ;
         }
 
-        sjtu::vector<int> pos ;
+        std::vector<int> pos ;
         curUsers.find (data (cur_username, 0), pos) ;
         if (pos.empty()) throw "user enot logged in" ;
         int cur_user_file_pos = pos[0] ;
@@ -272,7 +272,7 @@ public:
             else if (argument[i][1] == 'y') type = argument[i + 1][0] ;
         }
 
-        sjtu::vector<int> pos ;
+        std::vector<int> pos ;
         trains.find (data (trainID, 0), pos) ;
         if (!pos.empty()) throw "train already exists" ;
         
@@ -289,7 +289,7 @@ public:
             if (argument[i][1] == 'i') trainID = string (argument[i + 1]) ;
         }
 
-        sjtu::vector<int> pos ;
+        std::vector<int> pos ;
         trains.find (data (trainID, 0), pos) ;
         if (pos.empty()) throw "train not found" ;
         int train_file_pos = pos[0] ;
@@ -308,7 +308,7 @@ public:
             else if (argument[i][1] == 'd') date = Time (argument[i + 1], string ("00:00")) ;
         }
 
-        sjtu::vector<int> pos ;
+        std::vector<int> pos ;
         trains.find (data (trainID, 0), pos) ;
         if (pos.empty()) throw "train not found" ;
         int train_file_pos = pos[0] ;
