@@ -9,7 +9,7 @@
 #include <vector>
 
 #include "string.h"
-// #include "vector.h"
+#include "vector.h"
 #include "data.hpp"
 //using std::vector;
 void insert_sort(data *a , int num , const data &Isert){//二分法插入排序

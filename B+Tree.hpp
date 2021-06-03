@@ -8,9 +8,9 @@
 #include <vector>
 
 #include "data.hpp"
-// #include "vector.h"
+#include "vector.h"
 
-const int size = 200 ;
+const int size = 30 ;
 
 using namespace std;
 
