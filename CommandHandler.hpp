@@ -568,6 +568,7 @@ public:
                     cur_train.sellSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation(), pending_order.getSeatNum()) ;
                     pending_order.setStatus (success) ;
                     order_write (tmp[i], pending_order) ;
+                    pendingOrders.erase (data (trainID, tmp[i])) ;
                 }
             }
             train_write (train_file_pos, cur_train) ;
