@@ -14,8 +14,8 @@ class train {
 
 private:
     bool released ;
-    int stationNum, seatNum ;
-    segmentTree seat[110] ;
+    int stationNum, seatNum, seat[110][110] ;
+    // segmentTree seat[110] ;
     int priceSum[110], travelTimesSum[110], stopoverTimesSum[110] ;
     char type ;
     String trainID, stations[110] ;
@@ -36,8 +36,11 @@ public:
         released = 0 ;
 
         int days = saleDate[2].daysBetweenTime (saleDate[1]) ;
+        // for (int i = 0; i <= days; i ++)
+        //     seat[i].build (stationNum, seatNum) ;
         for (int i = 0; i <= days; i ++)
-            seat[i].build (stationNum, seatNum) ;
+            for (int j = 0; j <= stationNum; j ++)
+                seat[i][j] = seatNum ;
 
         priceSum[0] = 0 ;
         for (int i = 1; i < stationNum; i ++)
@@ -175,11 +178,11 @@ public:
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
         assert (stations[from_id] == fromStation) ;
         assert (stations[to_id] == toStation) ;
-        return seat[days].query (from_id, to_id - 1) ;
-        // int seats = 1e9 ;
-        // for (int i = from_id; i < to_id; i ++)
-        //     seats = std::min (seats, seat[days][i]) ;
-        // return seats ;
+        // return seat[days].query (from_id, to_id - 1) ;
+        int seats = 1e9 ;
+        for (int i = from_id; i < to_id; i ++)
+            seats = std::min (seats, seat[days][i]) ;
+        return seats ;
     }
 
     void sellSeats (const Time &startTime, const String &fromStation, const String &toStation, const int ticketNum) {
@@ -187,9 +190,9 @@ public:
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
         assert (stations[from_id] == fromStation) ;
         assert (stations[to_id] == toStation) ;
-        seat[days].update (from_id, to_id - 1, -ticketNum) ;
-        // for (int i = from_id; i < to_id; i ++)
-        //     seat[days][i] -= ticketNum ;
+        // seat[days].update (from_id, to_id - 1, -ticketNum) ;
+        for (int i = from_id; i < to_id; i ++)
+            seat[days][i] -= ticketNum ;
     }
 
     void addSeats (const Time &startTime, const String &fromStation, const String &toStation, const int ticketNum) {
@@ -197,9 +200,9 @@ public:
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
         assert (stations[from_id] == fromStation) ;
         assert (stations[to_id] == toStation) ;
-        seat[days].update (from_id, to_id - 1, ticketNum) ;
-        // for (int i = from_id; i < to_id; i ++)
-        //     seat[days][i] += ticketNum ;
+        // seat[days].update (from_id, to_id - 1, ticketNum) ;
+        for (int i = from_id; i < to_id; i ++)
+            seat[days][i] += ticketNum ;
     }
 
     void print (const Time &date) {
@@ -209,11 +212,11 @@ public:
         std::cout << trainID << " " << type << std::endl ;
         for (int i = 1; i <= stationNum; i ++) {
             if (i == 1) {
-                std::cout << stations[i] << " xx-xx xx:xx -> " << tim << " " << priceSum[i - 1] << " " << seat[days].query (i, i) << std::endl ;
+                std::cout << stations[i] << " xx-xx xx:xx -> " << tim << " " << priceSum[i - 1] << " " << seat[days][i] << std::endl ;
             } else if (i == stationNum) {
                 std::cout << stations[i] << " " << tim + travelTimesSum[i - 1] + stopoverTimesSum[i] << " -> xx-xx xx:xx " << priceSum[i - 1] << " x" << std::endl ; 
             } else {
-                std::cout << stations[i] << " " << tim + travelTimesSum[i - 1] + stopoverTimesSum[i - 1] << " -> " << tim + travelTimesSum[i - 1] + stopoverTimesSum[i] << " " << priceSum[i - 1] << " " << seat[days].query (i, i) << std::endl ;
+                std::cout << stations[i] << " " << tim + travelTimesSum[i - 1] + stopoverTimesSum[i - 1] << " -> " << tim + travelTimesSum[i - 1] + stopoverTimesSum[i] << " " << priceSum[i - 1] << " " << seat[days][i] << std::endl ;
             }
         }
     }
