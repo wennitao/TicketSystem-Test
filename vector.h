@@ -264,7 +264,7 @@ namespace sjtu {
          * Atleast two: default constructor, copy constructor
          */
     private:
-        void sort(int l , int r , bool (*p)(T , T)){
+        void sort(int l , int r , bool (*p)(const &T , const &T)){
             int left = l;
             int right = r;
             T mid = *data[(l + r) >> 1];

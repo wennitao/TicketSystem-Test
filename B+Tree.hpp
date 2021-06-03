@@ -130,7 +130,7 @@ public:
         }
     }
 
-    void find (int v, const data &x, std::vector<int> &res) { //find node == x
+    void find (int v, const data &x, sjtu::vector<int> &res) { //find node == x
         if (v == -1) return ;
         node cur = disk_read (v) ;
         int pos = 0 ;
@@ -143,7 +143,7 @@ public:
         } else {
             if (pos == cur.keyCnt || x.str < cur.key[pos].str) find (cur.son[pos], x, res) ;
             else {
-                std::vector<int> tmp ;
+                sjtu::vector<int> tmp ;
                 find (cur.son[pos], x, tmp) ;
                 for (int i = 0; i < tmp.size(); i ++) res.push_back (tmp[i]) ;
                 for (; pos < cur.keyCnt && cur.key[pos].str == x.str; pos ++) {
@@ -165,7 +165,7 @@ public:
         return cur.key[pos.second].pos ;
     }
 
-    void find (const data &x, std::vector<int> &res) {
+    void find (const data &x, sjtu::vector<int> &res) {
         find (root, x, res) ;
     }
 
