@@ -47,6 +47,10 @@
         "streambuf": "cpp",
         "typeinfo": "cpp",
         "ctime": "cpp",
-        "iomanip": "cpp"
+        "iomanip": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "bitset": "cpp",
+        "stack": "cpp"
     }
 }

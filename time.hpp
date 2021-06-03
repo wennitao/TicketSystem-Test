@@ -72,6 +72,14 @@ public:
         return res ;
     }
 
+    int operator - (const Time &time) const {
+        int res = min - time.min ;
+        res += (h - time.h) * 60 ;
+        int day = d - time.d ;
+        for (int i = time.m; i < m; i ++) day += days[i] ;
+        return res + day * 1440 ;
+    }
+
     void clearTime () {
         h = min = 0 ;
     }

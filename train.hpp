@@ -74,6 +74,18 @@ public:
         return seatNum ;
     }
 
+    int getStationNum () const {
+        return stationNum ;
+    }
+
+    String getStation (const int id) const {
+        return stations[id] ;
+    }
+
+    int getStationID (const String &station) const {
+        return stationHashMap.find (station) ;
+    }
+
     bool runningOnDate (const Time &date) const {
         return saleDate[1] <= date && date <= saleDate[2] ;
     }
@@ -82,6 +94,15 @@ public:
         Time startTime = getStartTime (date, station) ;
         startTime.clearTime() ;
         return runningOnDate (startTime) ;
+    }
+
+    bool canDepartFromStationAferTime (const Time &time, const String &station) const {
+        int stationID = stationHashMap.find (station) ;
+        assert (stations[stationID] == station) ;
+        Time res = time ;
+        res = res - travelTimesSum[stationID - 1] - stopoverTimesSum[stationID] ;
+        Time limit = saleDate[2]; limit.setTime (startTime) ;
+        return res <= limit ;
     }
     
     bool direction (const String &fromStation, const String &toStation) const {
@@ -105,6 +126,21 @@ public:
         int stationID = stationHashMap.find (station) ;
         assert (stations[stationID] == station) ;
         return time - travelTimesSum[stationID - 1] - stopoverTimesSum[stationID] ;
+    }
+
+    Time getStartTimeAfterTime (const Time &time, const String &station) const {
+        int stationID = stationHashMap.find (station) ;
+        assert (stations[stationID] == station) ;
+        Time res = time ;
+        res = res - travelTimesSum[stationID - 1] - stopoverTimesSum[stationID] ;
+        Time low_limit = saleDate[1], up_limit = saleDate[2] ;
+        low_limit.setTime (startTime); up_limit.setTime (startTime) ;
+        if (res <= low_limit) return low_limit ;
+        else {
+            Time tmp = res; tmp.setTime (startTime) ;
+            if (res <= tmp) return tmp ;
+            else return tmp + 1440 ;
+        }
     }
 
     Time getLeavingTime (const Time &startTime, const String &station) const {

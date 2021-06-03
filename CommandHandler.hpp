@@ -445,7 +445,70 @@ public:
     }
 
     void query_transfer () {
-        printf("0\n") ;
+        String fromStation, toStation ;
+        Time date ;
+        bool priority = 0 ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 's') fromStation = String (argument[i + 1]) ;
+            else if (argument[i][1] == 't') toStation = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'd') date = Time (String (argument[i + 1]), 0) ;
+            else if (argument[i][1] == 'p') priority = String (argument[i + 1]) == String ("time") ? 0 : 1 ;
+        }
+
+        std::vector<int> train1_pos, train2_pos ;
+        trainStations.find (data (fromStation, 0), train1_pos) ;
+        trainStations.find (data (toStation, 0), train2_pos) ;
+
+        int cost = 1e9 ;
+        order order_1, order_2 ;
+
+        for (int i = 0; i < train1_pos.size(); i ++) {
+            train train1 = train_read (train1_pos[i]) ;
+            if (!train1.isReleased()) continue ;
+            if (!train1.canDepartFromStationOnDate (date, fromStation)) continue ;
+            Time train1_startTime = train1.getStartTime (date, fromStation) ;
+            int train1_stationNum = train1.getStationNum() ;
+            for (int stationID = train1.getStationID (fromStation) + 1; stationID <= train1_stationNum; stationID ++) {
+                String midStation = train1.getStation (stationID) ;
+                if (midStation == toStation) continue ;
+                Time train1_leavingTime = train1.getLeavingTime (train1_startTime, fromStation) ;
+                Time train1_arrivingTime = train1.getArrivingTime (train1_startTime, midStation) ;
+                int train1_travellingTime = train1.calTravellingTime (fromStation, midStation) ;
+                int train1_price = train1.calPrice (fromStation, midStation) ;
+                int train1_seat = train1.calSeats (train1_startTime, fromStation, midStation) ;
+
+                for (int j = 0; j < train2_pos.size(); j ++) {
+                    if (train1_pos[i] == train2_pos[j]) continue ;
+                    train train2 = train_read (train2_pos[j]) ;
+                    if (!train2.isReleased()) continue ;
+                    if (!train2.direction (midStation, toStation)) continue ;
+                    if (!train2.canDepartFromStationAferTime (train1_arrivingTime, midStation)) continue ;
+
+                    Time train2_startTime = train2.getStartTimeAfterTime (train1_arrivingTime, midStation) ;
+                    Time train2_leavingTime = train2.getLeavingTime (train2_startTime, midStation) ;
+                    Time train2_arrivingTime = train2.getArrivingTime (train2_startTime, toStation) ;
+                    int train2_travellingTime = train2.calTravellingTime (midStation, toStation) ;
+                    int train2_price = train2.calPrice (midStation, toStation) ;
+                    int train2_seat = train2.calSeats (train2_startTime, midStation, toStation) ;
+
+                    int travellingTime = train2_arrivingTime - train1_leavingTime ;
+                    if (priority == 0 && (travellingTime < cost || (travellingTime == cost && train1_travellingTime < order_1.getTravellingTime()))) {
+                        cost = travellingTime ;
+                        order_1 = order (train1.getTrainID(), fromStation, midStation, train1_leavingTime, train1_arrivingTime, train1_price, train1_seat, train1_travellingTime) ;
+                        order_2 = order (train2.getTrainID(), midStation, toStation, train2_leavingTime, train2_arrivingTime, train2_price, train2_seat, train2_travellingTime) ;
+                    }
+                    if (priority == 1 && (train1_price + train2_price < cost || (train1_price + train2_price == cost && train1_travellingTime < order_1.getTravellingTime()))) {
+                        cost = train1_price + train2_price ;
+                        order_1 = order (train1.getTrainID(), fromStation, midStation, train1_leavingTime, train1_arrivingTime, train1_price, train1_seat, train1_travellingTime) ;
+                        order_2 = order (train2.getTrainID(), midStation, toStation, train2_leavingTime, train2_arrivingTime, train2_price, train2_seat, train2_travellingTime) ;
+                    }
+                }
+            }
+        }
+        if (cost == 1e9) printf("0\n") ;
+        else {
+            order_1.print(); order_2.print() ;
+        }
     }
 
     void buy_ticket () {
