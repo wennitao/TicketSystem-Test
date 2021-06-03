@@ -12,9 +12,9 @@ class String {
 public:
     char str[35];
     int len = 0;//记录字母个数，有一个记一个
+    unsigned long long hash_val = 0 ;
 public:
     String(const char *ch) {
-        assert (strlen (ch) < 35) ;
         strcpy (str, ch) ;
         len = strlen (ch); str[len] = '\0' ;
     }
@@ -31,14 +31,12 @@ public:
         if (this == &ot){
             return *this;
         }
-        assert (strlen (ot.str) < 35) ;
         len = ot.len;
         strcpy (str, ot.str);
         str[len] = '\0' ;
         return *this;
     }
     String& operator = (const char *_str) {
-        assert (strlen (_str) < 35) ;
         strcpy (str, _str) ;
         len = strlen (_str) ;
         return *this ;

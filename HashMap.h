@@ -43,14 +43,14 @@ private:
 public:
     HashMap() = default;
     void insert(const String &key1 , int data1) {
-        pair nod (key1.hashit(), data1);
+        pair nod (key1.hash_val, data1);
         order[++cur] = nod;
     }
     void sort(){
         sort(1 , cur);
     }
     int find (const String &key1) const {
-        unsigned long long hash_val = key1.hashit() ;
+        unsigned long long hash_val = key1.hash_val ;
         int l = 0;
         int r = cur + 1;
         while (l + 1 < r){
