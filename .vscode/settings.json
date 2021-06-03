@@ -52,5 +52,6 @@
         "__split_buffer": "cpp",
         "bitset": "cpp",
         "stack": "cpp"
-    }
+    },
+    "python.pythonPath": "/usr/bin/python3"
 }
