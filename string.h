@@ -28,9 +28,7 @@ public:
     }
     ~String() {}
     String& operator=(const String &ot){
-        if (this == &ot){
-            return *this;
-        }
+        if (this == &ot) return *this;
         len = ot.len;
         strcpy (str, ot.str);
         str[len] = '\0' ;
@@ -95,12 +93,11 @@ public:
         res.len = r - l + 1 ;
         return res ;
     }
-    unsigned long long hashit() const {
-        unsigned long long res = 0;
+    void hashit() {
+        hash_val = 0 ;
         for (int i = 0; i < len; ++i) {
-            res = res * 13331 + str[i] ;//-64以避免大小写
+            hash_val = hash_val * 13331 + str[i] ;//-64以避免大小写
         }
-        return res;
     }
 };
 

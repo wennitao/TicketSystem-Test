@@ -269,14 +269,13 @@ public:
         for (int i = 0; i < len; i ++) {
             if (str[i] == '|') {
                 res[cur_id] = tmp ;
-                res[cur_id].hash_val = res[cur_id].hashit() ;
                 tmp.clear() ;
                 cur_id ++, cur_len = 0 ;
             } else {
                 tmp += str[i] ;
             }
         }
-        res[cur_id] = tmp; res[cur_id].hash_val = res[cur_id].hashit() ;
+        res[cur_id] = tmp ;
     }
 
     void split_int (int *res, char *str) {
