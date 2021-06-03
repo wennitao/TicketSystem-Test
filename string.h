@@ -35,10 +35,14 @@ public:
             return *this;
         }
         len = ot.len;
-        memset(str , 0 , sizeof str);
         strcpy (str, ot.str);
         str[len] = '\0' ;
         return *this;
+    }
+    String& operator = (const char *_str) {
+        strcpy (str, _str) ;
+        len = strlen (_str) ;
+        return *this ;
     }
     String& operator += (const char _c) {
         str[len ++] = _c; str[len] = 0 ;

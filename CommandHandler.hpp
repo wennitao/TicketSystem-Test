@@ -143,11 +143,11 @@ public:
         String cur_username, username, password, name, mailAddr ;
         int privilege ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'c') cur_username = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'p') password = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'n') name = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'm') mailAddr = String (argument[i + 1]) ;
+            if (argument[i][1] == 'c') cur_username = argument[i + 1] ;
+            else if (argument[i][1] == 'u') username = argument[i + 1] ;
+            else if (argument[i][1] == 'p') password = argument[i + 1] ;
+            else if (argument[i][1] == 'n') name = argument[i + 1] ;
+            else if (argument[i][1] == 'm') mailAddr = argument[i + 1] ;
             else if (argument[i][1] == 'g') privilege = String (argument[i + 1]).toInt() ;
         }
 
@@ -174,8 +174,8 @@ public:
     void login () {
         String username, password ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'p') password = String (argument[i + 1]) ;
+            if (argument[i][1] == 'u') username = argument[i + 1] ;
+            else if (argument[i][1] == 'p') password = argument[i + 1] ;
         }
 
         std::vector<int> pos ;
@@ -194,7 +194,7 @@ public:
     void logout () {
         String username ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+            if (argument[i][1] == 'u') username = argument[i + 1] ;
         }
         std::vector<int> pos ;
         curUsers.find (data (username, 0), pos) ;
@@ -207,8 +207,8 @@ public:
     void query_profile () {
         String cur_username, username ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'c') cur_username = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+            if (argument[i][1] == 'c') cur_username = argument[i + 1] ;
+            else if (argument[i][1] == 'u') username = argument[i + 1] ;
         }
 
         std::vector<int> pos ;
@@ -231,11 +231,11 @@ public:
         String cur_username, username, password, name, mailAddr ;
         int privilege = -1 ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'c') cur_username = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'p') password = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'n') name = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'm') mailAddr = String (argument[i + 1]) ;
+            if (argument[i][1] == 'c') cur_username = argument[i + 1] ;
+            else if (argument[i][1] == 'u') username = argument[i + 1] ;
+            else if (argument[i][1] == 'p') password = argument[i + 1] ;
+            else if (argument[i][1] == 'n') name = argument[i + 1] ;
+            else if (argument[i][1] == 'm') mailAddr = argument[i + 1] ;
             else if (argument[i][1] == 'g') privilege = String (argument[i + 1]).toInt() ;
         }
 
@@ -297,7 +297,7 @@ public:
         Time startTime, saleDate[3] ;
 
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
+            if (argument[i][1] == 'i') trainID = argument[i + 1] ;
             else if (argument[i][1] == 'n') stationNum = String (argument[i + 1]).toInt() ;
             else if (argument[i][1] == 'm') seatNum = String (argument[i + 1]).toInt() ;
             else if (argument[i][1] == 's') split_String (stations, argument[i + 1]) ;
@@ -306,7 +306,7 @@ public:
             else if (argument[i][1] == 't') split_int (travelTimes, argument[i + 1]) ;
             else if (argument[i][1] == 'o') split_int (stopoverTimes, argument[i + 1]) ;
             else if (argument[i][1] == 'd') {
-                String tmp = String (argument[i + 1]) ;
+                String tmp = argument[i + 1] ;
                 saleDate[1] = Time (tmp.substr (0, 4), 0); saleDate[2] = Time (tmp.substr (6, 10), 0) ;
             }
             else if (argument[i][1] == 'y') type = argument[i + 1][0] ;
@@ -330,7 +330,7 @@ public:
     void release_train () {
         String trainID ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
+            if (argument[i][1] == 'i') trainID = argument[i + 1] ;
         }
 
         std::vector<int> pos ;
@@ -348,7 +348,7 @@ public:
         String trainID ;
         Time date ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
+            if (argument[i][1] == 'i') trainID = argument[i + 1] ;
             else if (argument[i][1] == 'd') date = Time (argument[i + 1], 0) ;
         }
 
@@ -364,7 +364,7 @@ public:
     void delete_train () {
         String trainID ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
+            if (argument[i][1] == 'i') trainID = argument[i + 1] ;
         }
 
         std::vector<int> pos ;
@@ -393,10 +393,10 @@ public:
         Time date ;
         int priority = 0 ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 's') fromStation = String (argument[i + 1]) ;
-            else if (argument[i][1] == 't') toStation = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'd') date = Time (String (argument[i + 1]), String ("00:00")) ;
-            else if (argument[i][1] == 'p') priority = String (argument[i + 1]) == String ("time") ? 0 : 1 ;
+            if (argument[i][1] == 's') fromStation = argument[i + 1] ;
+            else if (argument[i][1] == 't') toStation = argument[i + 1] ;
+            else if (argument[i][1] == 'd') date = Time (argument[i + 1], 0) ;
+            else if (argument[i][1] == 'p') priority = strcmp (argument[i + 1], "time") == 0 ? 0 : 1 ;
         }
 
         std::vector<int> train1, train2 ;
@@ -450,10 +450,10 @@ public:
         Time date ;
         bool priority = 0 ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 's') fromStation = String (argument[i + 1]) ;
-            else if (argument[i][1] == 't') toStation = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'd') date = Time (String (argument[i + 1]), 0) ;
-            else if (argument[i][1] == 'p') priority = String (argument[i + 1]) == String ("time") ? 0 : 1 ;
+            if (argument[i][1] == 's') fromStation = argument[i + 1] ;
+            else if (argument[i][1] == 't') toStation = argument[i + 1] ;
+            else if (argument[i][1] == 'd') date = Time (argument[i + 1], 0) ;
+            else if (argument[i][1] == 'p') priority = strcmp (argument[i + 1], "time") == 0 ? 0 : 1 ;
         }
 
         std::vector<int> train1_pos, train2_pos ;
@@ -518,13 +518,13 @@ public:
         int ticketNum ;
         bool queue = 0 ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'd') date = Time (String (argument[i + 1]), 0) ;
+            if (argument[i][1] == 'u') username = argument[i + 1] ;
+            else if (argument[i][1] == 'i') trainID = argument[i + 1] ;
+            else if (argument[i][1] == 'd') date = Time (argument[i + 1], 0) ;
             else if (argument[i][1] == 'n') ticketNum = String (argument[i + 1]).toInt() ;
-            else if (argument[i][1] == 'f') fromStation = String (argument[i + 1]) ;
-            else if (argument[i][1] == 't') toStation = String (argument[i + 1]) ;
-            else if (argument[i][1] == 'q') queue = String (argument[i + 1]) == String ("false") ? 0 : 1 ;
+            else if (argument[i][1] == 'f') fromStation = argument[i + 1] ;
+            else if (argument[i][1] == 't') toStation = argument[i + 1] ;
+            else if (argument[i][1] == 'q') queue = strcmp (argument[i + 1], "false") == 0 ? 0 : 1 ;
         }
 
         std::vector<int> pos ;
@@ -575,7 +575,7 @@ public:
     void query_order () {
         String username ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+            if (argument[i][1] == 'u') username = argument[i + 1] ;
         }
 
         std::vector<int> pos ;
@@ -596,7 +596,7 @@ public:
         String username ;
         int num = 1 ;
         for (int i = 2; i <= key_cnt; i += 2) {
-            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+            if (argument[i][1] == 'u') username = argument[i + 1] ;
             else if (argument[i][1] == 'n') num = String (argument[i + 1]).toInt() ;
         }
 
