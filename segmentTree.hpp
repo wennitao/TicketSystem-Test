@@ -24,9 +24,9 @@ public:
         if (add[rt] == 0) return ;
         int m = (l + r) >> 1 ;
         add[rt * 2] += add[rt] ;
-        val[rt * 2] += add[rt] * (m - l + 1) ;
+        val[rt * 2] += add[rt] ;
         add[rt * 2 + 1] += add[rt] ;
-        val[rt * 2 + 1] += add[rt] * (r - m) ;
+        val[rt * 2 + 1] += add[rt] ;
         add[rt] = 0 ;
     }
     void build (int a, int l, int r, int rt) {
@@ -43,8 +43,7 @@ public:
     }
     void update (int L, int R, int add_val, int l, int r, int rt) {
         if (L <= l && R >= r) {
-            val[rt] += (r - l + 1) * add_val ;
-            add[rt] += add_val ;
+            val[rt] += add_val; add[rt] += add_val ;
             return ;
         }
         pushdown (l, r, rt) ;
