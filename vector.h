@@ -264,21 +264,21 @@ namespace sjtu {
          * Atleast two: default constructor, copy constructor
          */
     private:
-        void sort(int l , int r){
+        void sort(int l , int r , bool (*p)(T , T)){
             int left = l;
             int right = r;
             T mid = *data[(l + r) >> 1];
             do {
-                while (*data[left] < mid)left++;
-                while (mid < *data[right])right--;
+                while (p(*data[left] , mid))left++;
+                while (p(*data[right] , mid))right--;
                 if (left <= right){
                     swap(data[left] , data[right]);
                     left++;
                     right--;
                 }
             } while (left <= right);
-            if (right > l)sort(l , right);
-            if (left < r)sort(left , r);
+            if (right > l)sort(l , right , p);
+            if (left < r)sort(left , r , p);
         }
     public:
         vector() {

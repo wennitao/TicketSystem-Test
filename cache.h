@@ -4,17 +4,21 @@
 
 #ifndef CODE_CACHE_H
 #define CODE_CACHE_H
-template <class Key , class Data>//通过站名返回地址
+#include "string.h"
+#include "Bpt_and_database.h"
+#include "data.hpp"
+//cache : 由一个哈希表和一个双向链表组成 哈希表将B+树node的地址哈希并且存进双向链表的指针 双向链表存进B+树的node数据
+template <class Data>//通过站名返回地址
 class HashTable{
 private:
     class List{
     private:
         struct Node{
             Node* next;
-            Key key;
+            int key;
             Data data;
             Node() = delete;
-            Node(Node *nxt ,const Key &key1 ,const Data &data1):next(nxt),key(key1),data(data1){};
+            Node(Node *nxt ,const int &key1 ,const Data &data1):next(nxt),key(key1),data(data1){};
         };
         Node* head;
         int Listsize;
@@ -27,11 +31,11 @@ private:
                 delete tmp;
             }
         }
-        void insert(const Key &key1 , const Data &data1){
+        void insert(const int &key1 , const Data &data1){
             head = new Node(head , key1 , data1);
             ++Listsize;
         }
-        Node* find(const Key &key1){
+        Node* find(const int &key1){
             if (Listsize == 0)return nullptr;
             Node *q = head;
             while (q != nullptr){
@@ -40,7 +44,7 @@ private:
             }
             return nullptr;
         }
-        void erase(const Key &key1){
+        void erase(const int &key1){
             if (Listsize == 0)return;
             if (head->key == key1){
                 Node* tmp = head;
@@ -61,6 +65,107 @@ private:
             --Listsize;
         }
     };
+    int capacity;
+    List* dataset;
+    int getIndex(const int &key1){
+        //return key1.hashit() % capacity;
+        return key1 % capacity;
+    }
 
+public:
+    HashTable() = delete;
+    explicit HashTable(const int capacity1){
+        capacity = capacity1;
+        dataset = new List[capacity1];
+    }
+    ~HashTable(){
+        delete []dataset;
+    }
+    bool exist(const int &key1){
+        int index = getIndex(key1);
+        return (dataset[index].find(key1) != nullptr);
+    }
+
+    void insert(const int &key1 , const Data &data1){
+        int index = getIndex(key1);
+        dataset[index].insert(key1 , data1);
+    }
+    Data& find(const int &key1){
+        int index = getIndex(key1);
+        return dataset[index].find(key1)->data;
+    }
+    Data& operator[](const int &key1){
+        return this->find(key1);
+    }
+    void clear(){
+        delete [] dataset;
+        dataset = new List [capacity];
+    }
+};
+template <class leaf>
+class doublelist{
+private:
+    struct node{
+        leaf data;
+        node* pre;
+        node* nxt;
+        node(){
+            pre = nullptr;
+            nxt = nullptr;
+        }
+        node(leaf data1 , node* pre1 , node* nxt1):data(data1),pre(pre1),nxt(nxt1){};
+    };
+    node* head;
+    node* tail;
+    doublelist(){
+        head->nxt = tail;
+        tail->pre = head;
+    }
+    ~doublelist(){
+        while (head->nxt != tail){
+            node* tmp = head->nxt;
+            head->nxt = tmp->nxt;
+            tail->pre = tmp->pre;
+            delete tmp;
+        }
+        head = nullptr;
+        tail = nullptr;
+    }
+    void insert(const leaf &le){
+        node* tmp = new node(le , head , head->nxt);
+        head->nxt->nxt->pre = tmp;
+        head->nxt = tmp;
+    }
+    void pop(){
+        node* tmp = tail->pre;
+        tmp->pre->nxt = tail;
+        tail->pre = tmp->pre;
+        delete tmp;
+    }
+};
+template<int x>
+class cache{
+//    friend Database;
+//    friend doublelist<Database::node>
+//    friend HashTable<doublelist<Database::node>::node>
+private:
+    const int size = x;
+    doublelist<Database::node> twolist;
+    HashTable<doublelist<Database::node>::node*> hashmap{};
+    int cnt = 0;
+public:
+    cache(){
+        twolist(x);
+        hashmap(x);
+        cnt = 0;
+    }
+    void insert(const int &pos , const Database::node &leav){//insert是加到最前面的
+        if (hashmap.exist(pos))return;
+        twolist.insert(leav);
+        doublelist<Database::node>::node* tmp = twolist.head->nxt;
+        hashmap.insert(pos , tmp);
+        cnt ++;
+        if (cnt > size)
+    }
 };
 #endif //CODE_CACHE_H
