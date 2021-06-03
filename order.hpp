@@ -46,7 +46,7 @@ public:
         std::cout << trainID << " " << fromStation << " " << leavingTime << " -> " << toStation << " " << arrivingTime << " " << price << " " << seat << std::endl ;
     }
 
-    String getTrainID () const {
+    String& getTrainID () {
         return trainID ;
     }
 
@@ -58,11 +58,11 @@ public:
         return leavingTime ;
     }
 
-    String getFromStation () const {
+    String& getFromStation () {
         return fromStation ;
     }
 
-    String getToStation () const {
+    String& getToStation () {
         return toStation ;
     }
 

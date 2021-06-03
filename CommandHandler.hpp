@@ -302,7 +302,7 @@ public:
             else if (argument[i][1] == 'm') seatNum = String (argument[i + 1]).toInt() ;
             else if (argument[i][1] == 's') split_String (stations, argument[i + 1]) ;
             else if (argument[i][1] == 'p') split_int (prices, argument[i + 1]) ;
-            else if (argument[i][1] == 'x') startTime = Time (0, String (argument[i + 1])) ;
+            else if (argument[i][1] == 'x') startTime = Time (0, argument[i + 1]) ;
             else if (argument[i][1] == 't') split_int (travelTimes, argument[i + 1]) ;
             else if (argument[i][1] == 'o') split_int (stopoverTimes, argument[i + 1]) ;
             else if (argument[i][1] == 'd') {
@@ -396,12 +396,12 @@ public:
     //     }
     // } ;
 
-    static bool cmp_time (const order &a, const order &b) {
+    static bool cmp_time (order &a, order &b) {
         if (a.getTravellingTime() == b.getTravellingTime()) return a.getTrainID() < b.getTrainID() ;
         return a.getTravellingTime() < b.getTravellingTime() ;
     }
 
-    static bool cmp_cost (const order &a, const order &b) {
+    static bool cmp_cost (order &a, order &b) {
         if (a.getPrice() == b.getPrice()) return a.getTrainID() < b.getTrainID() ;
         return a.getPrice() < b.getPrice() ;
     }
@@ -541,7 +541,7 @@ public:
         for (int i = 2; i <= key_cnt; i += 2) {
             if (argument[i][1] == 'u') username = argument[i + 1] ;
             else if (argument[i][1] == 'i') trainID = argument[i + 1] ;
-            else if (argument[i][1] == 'd') date = Time (String (argument[i + 1]), 0) ;
+            else if (argument[i][1] == 'd') date = Time (argument[i + 1], 0) ;
             else if (argument[i][1] == 'n') ticketNum = String (argument[i + 1]).toInt() ;
             else if (argument[i][1] == 'f') fromStation = argument[i + 1] ;
             else if (argument[i][1] == 't') toStation = argument[i + 1] ;

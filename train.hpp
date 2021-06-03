@@ -61,7 +61,7 @@ public:
         stationHashMap.sort() ;
     }
 
-    String getTrainID () const {
+    String& getTrainID ()  {
         return trainID ;
     }
 
@@ -82,7 +82,7 @@ public:
         return stationNum ;
     }
 
-    String getStation (const int id) const {
+    String& getStation (const int id) {
         return stations[id] ;
     }
 

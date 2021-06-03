@@ -49,7 +49,7 @@ public:
     void sort(){
         sort(1 , cur);
     }
-    int find (String key1) const {
+    int find (const String &key1) const {
         unsigned long long hash_val = key1.hashit() ;
         int l = 0;
         int r = cur + 1;

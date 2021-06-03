@@ -14,7 +14,7 @@ struct data {
     }
     data (const char *_str, int p) {
         //memset(str.str , 0 , sizeof str.str);
-        str = String (_str) ;
+        str = _str ;
         pos = p ;
     }
     data (const String& _str, int p) {
@@ -25,8 +25,8 @@ struct data {
     // }
     data& operator=(const data &ot){
         if (this == &ot)return *this;
-        memset(str.str , 0 , sizeof str.str);
-        strcpy(str.str , ot.str.str);
+        // memset(str.str , 0 , sizeof str.str);
+        str = ot.str ;
         str.len = ot.str.len;
         pos = ot.pos;
         return *this;
