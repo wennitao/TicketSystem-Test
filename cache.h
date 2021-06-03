@@ -156,7 +156,7 @@ private:
         head->nxt = re;
     }
 };
-template<int x>
+template<int x = 100>
 class cache{
 //    friend Database;
 //    friend doublelist<Database::node>

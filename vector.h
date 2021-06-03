@@ -554,7 +554,7 @@ namespace sjtu {
         }
         void sort2(){
             cmp2 Cmp2 ;
-            sort2(0 , cur - 1 , Cmp2);
+            sort2(0 , cur - 1 , cmp2);
         }
         void sort3(){
             cmp3 Cmp3 ;
