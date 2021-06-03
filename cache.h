@@ -136,8 +136,8 @@ private:
         head = nullptr;
         tail = nullptr;
     }
-    void insert(const leaf &le){
-        node* tmp = new node(le , head , head->nxt);
+    void insert(const leaf &le , const int &pos){
+        node* tmp = new node(le , pos , head , head->nxt);
         head->nxt->nxt->pre = tmp;
         head->nxt = tmp;
     }
@@ -146,6 +146,14 @@ private:
         tmp->pre->nxt = tail;
         tail->pre = tmp->pre;
         delete tmp;
+    }
+    void move_to_head(node* re){
+        re->pre->nxt = re->nxt;
+        re->nxt->pre = re->pre;
+        head->nxt->pre = re;
+        re->nxt = head->nxt;
+        re->pre = head;
+        head->nxt = re;
     }
 };
 template<int x>
@@ -156,21 +164,32 @@ class cache{
 private:
     const int size = x;
     doublelist<Database::node> twolist;
-    HashTable<doublelist<Database::node>::node*> hashmap{};
+    HashTable<doublelist<Database::node>::node*> hashmap;
     int cnt = 0;
 public:
-    cache(){
-        twolist(x);
-        hashmap(x);
+    cache():hashmap(x),twolist(x){
         cnt = 0;
     }
     void insert(const int &pos , const Database::node &leav){//insert是加到最前面的
         if (hashmap.exist(pos))return;
-        twolist.insert(leav);
+        twolist.insert(leav , pos);
         doublelist<Database::node>::node* tmp = twolist.head->nxt;
         hashmap.insert(pos , tmp);
         cnt ++;
-        if (cnt > size)
+        if (cnt > size){
+            int posi = twolist.tail->pre->position;
+            twolist.pop();
+            hashmap.erase(posi);
+            cnt--;
+        }
+    }
+    Database::node query(const int &pos){
+        if (!hashmap.exist(pos))return Database::node();
+        else {
+            twolist.move_to_head(hashmap.find(pos));
+            Database::node tmp = hashmap.find(pos)->data;
+            return tmp;
+        }
     }
 };
 #endif //CODE_CACHE_H
