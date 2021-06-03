@@ -206,7 +206,7 @@ void Database::find(int nod, const data &x, std::vector<int> &cap) {
 
     while (!cur.is_leaf){
         int pos = 0;
-        for (;pos < cur.keycnt && cur.key[pos] < x ; pos++);
+        for (;pos < cur.keycnt && cur.key[pos].str < x.str ; pos++);
         cur = disk_read(cur.son[pos]);
     }
     int pos = 0;

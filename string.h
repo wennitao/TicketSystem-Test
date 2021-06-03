@@ -35,6 +35,7 @@ public:
             return *this;
         }
         len = ot.len;
+        memset(str , 0 , sizeof str);
         strcpy (str, ot.str);
         str[len] = '\0' ;
         return *this;
