@@ -8,11 +8,11 @@
 #include <algorithm>
 
 #include "main.h"
-#include "Bpt_and_database.h"
-// #include "B+Tree.hpp"
+// #include "Bpt_and_database.h"
+#include "B+Tree.hpp"
 #include "data.hpp"
 #include "string.h"
-#include "vector.h"
+// #include "vector.h"
 
 #include "user.hpp"
 #include "train.hpp"
