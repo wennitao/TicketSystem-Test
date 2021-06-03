@@ -85,7 +85,10 @@ public:
         int index = getIndex(key1);
         return (dataset[index].find(key1) != nullptr);
     }
-
+    void erase(const int &key1){
+        int index = getIndex(key1);
+        dataset[index].erase(key1);
+    }
     void insert(const int &key1 , const Data &data1){
         int index = getIndex(key1);
         dataset[index].insert(key1 , data1);
@@ -107,13 +110,15 @@ class doublelist{
 private:
     struct node{
         leaf data;
+        int position;
         node* pre;
         node* nxt;
         node(){
             pre = nullptr;
             nxt = nullptr;
+            position = -1;
         }
-        node(leaf data1 , node* pre1 , node* nxt1):data(data1),pre(pre1),nxt(nxt1){};
+        node(leaf data1 , int pos , node* pre1 , node* nxt1):data(data1),pre(pre1),nxt(nxt1),position(pos){};
     };
     node* head;
     node* tail;

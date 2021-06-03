@@ -511,8 +511,8 @@ namespace sjtu {
         }
 
         //下面是快排完成sort;
-        void sort(){
-            sort(0 , cur - 1);
+        void sort(bool (*p)(T , T)){
+            sort(0 , cur - 1 , p);
         }
     };
 
