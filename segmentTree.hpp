@@ -9,16 +9,14 @@
 class segmentTree {
 
 private:
-    int *val = nullptr, *add = nullptr ;
+    int n ;
+    int val[410], add[410] ;
 
 public:
-    segmentTree () {} 
-    segmentTree (int size) {
-        val = new int [(size + 5) * 4] ;
-        add = new int [(size + 5) * 4] ;
+    segmentTree () {
         memset (val, 0, sizeof val) ;
         memset (add, 0, sizeof add) ;
-    }
+    } 
     void pushup (int rt) {
         val[rt] = std::min (val[rt * 2], val[rt * 2 + 1]) ;
     }
@@ -31,19 +29,17 @@ public:
         val[rt * 2 + 1] += add[rt] * (r - m) ;
         add[rt] = 0 ;
     }
-    void build (int *a, int l, int r, int rt) {
-        add[rt] = 0 ;
+    void build (int a, int l, int r, int rt) {
         if (l == r) {
-            val[rt] = a[l]; return ;
+            val[rt] = a; return ;
         }
         int m = (l + r) >> 1 ;
         build (a, lson); build (a, rson) ;
         pushup (rt) ;
     }
-    segmentTree (int size, int *a) {
-        val = new int [(size + 5) * 4] ;
-        add = new int [(size + 5) * 4] ;
-        build (a, 1, size, 1) ;
+    void build (int size, int a) {
+        n = size ;
+        build (a, 1, n, 1) ;
     }
     void update (int L, int R, int add_val, int l, int r, int rt) {
         if (L <= l && R >= r) {
@@ -57,6 +53,9 @@ public:
         if (R > m) update (L, R, add_val, rson) ;
         pushup (rt) ;
     }
+    void update (int L, int R, int add_val) {
+        update (L, R, add_val, 1, n, 1) ;
+    }
     int query (int L, int R, int l, int r, int rt) {
         if (L <= l && R >= r) return val[rt] ;
         pushdown (l, r, rt) ;
@@ -64,6 +63,9 @@ public:
         if (L <= m) res = std::min (res, query (L, R, lson)) ;
         if (R > m) res = std::min (res, query (L, R, rson)) ;
         return res ;
+    }
+    int query (int L, int R) {
+        return query (L, R, 1, n, 1) ;
     }
 } ;
 
