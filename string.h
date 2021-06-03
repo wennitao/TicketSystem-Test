@@ -9,7 +9,7 @@ class String {
     friend std::ostream& operator << (std::ostream &out, const String &str) ;
 
 public:
-    char str[110];
+    char str[40];
     int len = 0;//记录字母个数，有一个记一个
 public:
     String(const char *ch){
