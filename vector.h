@@ -12,7 +12,7 @@ namespace sjtu {
  * a data container like std::vector
  * store data in a successive memory and support random access.
  */
-    template<typename T , class cmp1 = std::less<int> , class cmp2 = std::less<int>, class cmp3 = std::less<int>>
+    template<typename T>
     class vector {
     public:
         /**
@@ -264,13 +264,13 @@ namespace sjtu {
          * Atleast two: default constructor, copy constructor
          */
     private:
-        void sort1(int l , int r , cmp1 Cmp1){
+        void sort(int l , int r , bool* cmp (T & , T &)){
             int left = l;
             int right = r;
             T mid = *data[(l + r) >> 1];
             do {
-                while (Cmp1(*data[left] , mid))left++;
-                while (Cmp1(mid , *data[right]))right--;
+                while (cmp(*data[left] , mid))left++;
+                while (cmp(mid , *data[right]))right--;
                 if (left <= right){
                     // T tmp = *data[left] ;
                     // *data[left] = *data[right]; *data[right] = tmp ;
@@ -279,41 +279,41 @@ namespace sjtu {
                     right--;
                 }
             } while (left <= right);
-            if (right > l)sort1(l , right , Cmp1);
-            if (left < r)sort1(left , r , Cmp1);
+            if (right > l)sort1(l , right , cmp);
+            if (left < r)sort1(left , r , cmp);
         }
-        void sort2(int l , int r , cmp2 Cmp2){
-            int left = l;
-            int right = r;
-            T mid = *data[(l + r) >> 1];
-            do {
-                while (Cmp2(*data[left] , mid))left++;
-                while (Cmp2(mid , *data[right]))right--;
-                if (left <= right){
-                    std::swap(data[left] , data[right]);
-                    left++;
-                    right--;
-                }
-            } while (left <= right);
-            if (right > l)sort2(l , right , Cmp2);
-            if (left < r)sort2(left , r , Cmp2);
-        }
-        void sort3(int l , int r , cmp3 Cmp3){
-            int left = l;
-            int right = r;
-            T mid = *data[(l + r) >> 1];
-            do {
-                while (Cmp3(*data[left] , mid))left++;
-                while (Cmp3(mid , *data[right]))right--;
-                if (left <= right){
-                    std::swap(data[left] , data[right]);
-                    left++;
-                    right--;
-                }
-            } while (left <= right);
-            if (right > l)sort3(l , right , Cmp3);
-            if (left < r)sort3(left , r , Cmp3);
-        }
+//        void sort2(int l , int r , cmp2 Cmp2){
+//            int left = l;
+//            int right = r;
+//            T mid = *data[(l + r) >> 1];
+//            do {
+//                while (Cmp2(*data[left] , mid))left++;
+//                while (Cmp2(mid , *data[right]))right--;
+//                if (left <= right){
+//                    std::swap(data[left] , data[right]);
+//                    left++;
+//                    right--;
+//                }
+//            } while (left <= right);
+//            if (right > l)sort2(l , right , Cmp2);
+//            if (left < r)sort2(left , r , Cmp2);
+//        }
+//        void sort3(int l , int r , cmp3 Cmp3){
+//            int left = l;
+//            int right = r;
+//            T mid = *data[(l + r) >> 1];
+//            do {
+//                while (Cmp3(*data[left] , mid))left++;
+//                while (Cmp3(mid , *data[right]))right--;
+//                if (left <= right){
+//                    std::swap(data[left] , data[right]);
+//                    left++;
+//                    right--;
+//                }
+//            } while (left <= right);
+//            if (right > l)sort3(l , right , Cmp3);
+//            if (left < r)sort3(left , r , Cmp3);
+//        }
     public:
         vector() {
             len = 20;
@@ -548,21 +548,27 @@ namespace sjtu {
         }
 
         //下面是快排完成sort;
-        void sort1(){
-            cmp1 Cmp1 ;
-            sort1(0 , cur - 1 , Cmp1);
+        void sort(bool* cmp (T & , T &)){
+            sort(0 , cur - 1 , cmp);
         }
-        void sort2(){
-            cmp2 Cmp2 ;
-            sort2(0 , cur - 1 , Cmp2);
-        }
-        void sort3(){
-            cmp3 Cmp3 ;
-            sort3(0 , cur - 1 , Cmp3);
-        }
+//        void sort2(){
+//            cmp2 Cmp2 ;
+//            sort2(0 , cur - 1 , cmp2);
+//        }
+//        void sort3(){
+//            cmp3 Cmp3 ;
+//            sort3(0 , cur - 1 , Cmp3);
+//        }
     };
-
-
 }
-
+class Num{
+public:
+    int a;
+    int b;
+    Num(const int x , const int y):a(x) , b(y){};
+};
+bool compare(Num &x , Num &y){
+    if (x.a != y.a)return x.b < y.b;
+    else return x.a < y.a;
+}
 #endif //TICKETSYSTEM_VECTOR_H
