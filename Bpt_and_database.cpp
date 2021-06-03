@@ -6,7 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
-#include <vector>
+// #include <vector>
 #include "string.h"
 //#include <vector>
 #include "vector.h"

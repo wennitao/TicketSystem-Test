@@ -8,10 +8,11 @@
 #include <vector>
 
 #include "data.hpp"
-
-using namespace std;
+#include "vector.h"
 
 const int size = 30 ;
+
+using namespace std;
 
 class BPlusTree {
 private:
@@ -130,7 +131,7 @@ public:
         }
     }
 
-    void find (int v, const data &x, sjtu::vector<int> &res) { //find node == x
+    void find (int v, const data &x, std::vector<int> &res) { //find node == x
         if (v == -1) return ;
         node cur = disk_read (v) ;
         int pos = 0 ;
@@ -143,7 +144,7 @@ public:
         } else {
             if (pos == cur.keyCnt || x.str < cur.key[pos].str) find (cur.son[pos], x, res) ;
             else {
-                sjtu::vector<int> tmp ;
+                std::vector<int> tmp ;
                 find (cur.son[pos], x, tmp) ;
                 for (int i = 0; i < tmp.size(); i ++) res.push_back (tmp[i]) ;
                 for (; pos < cur.keyCnt && cur.key[pos].str == x.str; pos ++) {
@@ -165,7 +166,7 @@ public:
         return cur.key[pos.second].pos ;
     }
 
-    void find (const data &x, sjtu::vector<int> &res) {
+    void find (const data &x, std::vector<int> &res) {
         find (root, x, res) ;
     }
 
@@ -241,7 +242,7 @@ public:
             int cur_pos = search (root, x) ;
             node cur = disk_read (cur_pos) ;
             cur.key[cur.keyCnt ++] = x ;
-            sort (cur.key, cur.key + cur.keyCnt) ;
+            std::sort (cur.key, cur.key + cur.keyCnt) ;
             if (cur.keyCnt <= size) {
                 disk_write (cur_pos, cur) ;
             } else {

@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <cstring>
+#include <assert.h>
 
 class String {
 
@@ -12,7 +13,8 @@ public:
     char str[35];
     int len = 0;//记录字母个数，有一个记一个
 public:
-    String(const char *ch){
+    String(const char *ch) {
+        assert (strlen (ch) < 35) ;
         strcpy (str, ch) ;
         len = strlen (ch); str[len] = '\0' ;
     }
@@ -20,12 +22,7 @@ public:
         memset(str , 0 , sizeof str);
         len = 0;
     }
-    String(const String &ot){
-        // memset (str, 0, sizeof str) ;
-        // for (int i = 0; i < ot.len; ++i) {
-        //     str[i] = ot.str[i];
-        // }
-        // len = ot.len; str[len] = '\0' ;
+    String(const String &ot) {
         strcpy (str, ot.str) ;
         len = ot.len; str[len] = '\0' ;
     }
@@ -34,12 +31,14 @@ public:
         if (this == &ot){
             return *this;
         }
+        assert (strlen (ot.str) < 35) ;
         len = ot.len;
         strcpy (str, ot.str);
         str[len] = '\0' ;
         return *this;
     }
     String& operator = (const char *_str) {
+        assert (strlen (_str) < 35) ;
         strcpy (str, _str) ;
         len = strlen (_str) ;
         return *this ;

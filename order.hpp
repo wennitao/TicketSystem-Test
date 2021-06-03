@@ -6,7 +6,7 @@
 #include "string.h"
 
 enum Status {success, pending, refunded} ;
-const char status_str[3][20] = {"[success]", "[pending]", "[refunded]"} ;
+static const char status_str[3][20] = {"[success]", "[pending]", "[refunded]"} ;
 
 class order {
 
@@ -25,6 +25,21 @@ public:
         fromStation = _fromStation; toStation = _toStation ;
         leavingTime = _leavingTime; arrivingTime = _arrivingTime ;
         price = _price; seat = _seat; travellingTime = _travellingTime ;
+    }
+    order (const order &_order) {
+        trainID = _order.trainID; fromStation = _order.fromStation; toStation = _order.toStation ;
+        leavingTime = _order.leavingTime; arrivingTime = _order.arrivingTime ;
+        price = _order.price; seat = _order.seat; travellingTime = _order.travellingTime ;
+        status = _order.status ;
+    }
+
+    order& operator = (const order &_order) {
+        if (this == &_order) return *this ;
+        trainID = _order.trainID; fromStation = _order.fromStation; toStation = _order.toStation ;
+        leavingTime = _order.leavingTime; arrivingTime = _order.arrivingTime ;
+        price = _order.price; seat = _order.seat; travellingTime = _order.travellingTime ;
+        status = _order.status ;
+        return *this ;
     }
 
     void print () {

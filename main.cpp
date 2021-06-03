@@ -3,6 +3,8 @@
 #include <cstring>
 
 #include "main.h"
+// #include "Bpt_and_database.h"
+#include "B+Tree.hpp"
 #include "CommandHandler.hpp"
 
 BPlusTree users ("users_B+Tree.dat") ;
