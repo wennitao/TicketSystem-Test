@@ -151,6 +151,11 @@ public:
         assert (stations[to_id] == toStation) ;
         for (int i = from_id; i < to_id; i ++)
             seat[days][i] -= ticketNum ;
+        
+        printf("days:%d\n", days) ;
+        for (int i = 1; i < stationNum; i ++)
+            printf("%d ", seat[days][i]) ;
+        printf("\n") ;
     }
 
     void addSeats (const Time &startTime, const String &fromStation, const String &toStation, const int ticketNum) {
@@ -160,6 +165,11 @@ public:
         assert (stations[to_id] == toStation) ;
         for (int i = from_id; i < to_id; i ++)
             seat[days][i] += ticketNum ;
+
+        printf("days:%d\n", days) ;
+        for (int i = 1; i < stationNum; i ++)
+            printf("%d ", seat[days][i]) ;
+        printf("\n") ;
     }
 
     void print (const Time &date) const {
