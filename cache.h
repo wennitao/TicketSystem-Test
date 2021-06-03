@@ -74,7 +74,7 @@ private:
 
 public:
     HashTable() = delete;
-    HashTable(const int capacity1){
+    explicit HashTable(const int capacity1){
         capacity = capacity1;
         dataset = new List[capacity1];
     }
@@ -115,14 +115,9 @@ private:
         }
         node(leaf data1 , node* pre1 , node* nxt1):data(data1),pre(pre1),nxt(nxt1){};
     };
-    int size;
     node* head;
     node* tail;
-    int cnt;
-    doublelist() = delete;
-    doublelist(int Size){
-        size = Size;
-        cnt = 0;
+    doublelist(){
         head->nxt = tail;
         tail->pre = head;
     }
@@ -133,7 +128,6 @@ private:
             tail->pre = tmp->pre;
             delete tmp;
         }
-        cnt = 0;
         head = nullptr;
         tail = nullptr;
     }
@@ -141,10 +135,6 @@ private:
         node* tmp = new node(le , head , head->nxt);
         head->nxt->nxt->pre = tmp;
         head->nxt = tmp;
-        cnt++;
-        if (cnt > size){
-            this->pop();
-        }
     }
     void pop(){
         node* tmp = tail->pre;
@@ -159,14 +149,23 @@ class cache{
 //    friend doublelist<Database::node>
 //    friend HashTable<doublelist<Database::node>::node>
 private:
+    const int size = x;
     doublelist<Database::node> twolist;
-    HashTable<doublelist<Database::node>::node*> hashmap;
-
+    HashTable<doublelist<Database::node>::node*> hashmap{};
+    int cnt = 0;
 public:
-    cache() = default;
-    void insert(const int &pos , const Database::node &leav){
-
-        twolist.insert()
+    cache(){
+        twolist(x);
+        hashmap(x);
+        cnt = 0;
+    }
+    void insert(const int &pos , const Database::node &leav){//insert是加到最前面的
+        if (hashmap.exist(pos))return;
+        twolist.insert(leav);
+        doublelist<Database::node>::node* tmp = twolist.head->nxt;
+        hashmap.insert(pos , tmp);
+        cnt ++;
+        if (cnt > size)
     }
 };
 #endif //CODE_CACHE_H
