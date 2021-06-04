@@ -7,40 +7,32 @@
 #include "string.h"
 
 struct data {
-    String str; int pos ;
+    int hash_val, pos ;
     data () {
-        //memset(str.str , 0 , sizeof str);
         pos = -1 ;
     }
-    data (const char *_str, int p) {
-        //memset(str.str , 0 , sizeof str.str);
-        str = _str ;
+    data (const int _hash_val, int p) {
+        hash_val = _hash_val ;
         pos = p ;
     }
-    data (const String& _str, int p) {
-        str = _str; pos = p ;
+    data (const String &str, int p) {
+        hash_val = str.hashit(); pos = p ;
     }
-    // void print() const {
-    //     std::cout << str << " " << pos << std::endl ;
-    // }
     data& operator=(const data &ot){
-        if (this == &ot)return *this;
-        // memset(str.str , 0 , sizeof str.str);
-        str = ot.str ;
-        str.len = ot.str.len;
-        pos = ot.pos;
+        if (this == &ot) return *this;
+        hash_val = ot.hash_val; pos = ot.pos ;
         return *this;
     }
     bool operator < (const data &a) const {
-        if (str == a.str) return pos < a.pos ;
-        return str < a.str ;
+        if (hash_val == a.hash_val) return pos < a.pos ;
+        return hash_val < a.hash_val ;
     }
     bool operator <= (const data &a) const {
-        if (str == a.str) return pos <= a.pos ;
-        return str < a.str ;
+        if (hash_val == a.hash_val) return pos <= a.pos ;
+        return hash_val < a.hash_val ;
     }
     bool operator == (const data &a) const {
-        return str == a.str && pos == a.pos ;
+        return hash_val == a.hash_val && pos == a.pos ;
     }
 } ;
 
