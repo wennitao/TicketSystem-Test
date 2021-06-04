@@ -15,8 +15,8 @@ struct data {
         hash_val = _hash_val ;
         pos = p ;
     }
-    data (const String &str, int p) {
-        hash_val = str.hashit(); pos = p ;
+    data (String &str, int p) {
+        hash_val = str.hash_val; pos = p ;
     }
     data& operator=(const data &ot){
         if (this == &ot) return *this;

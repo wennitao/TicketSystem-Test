@@ -114,11 +114,9 @@ public:
         trainio.write (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
     }
 
-    order order_read (int pos) {
+    void order_read (order &cur, int pos) {
         orderio.seekg (pos, std::ios::beg) ;
-        order cur ;
         orderio.read (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
-        return cur ;
     }
 
     int order_write (order &cur) {
@@ -646,7 +644,7 @@ public:
             std::swap (pos[i], pos[pos.size() - 1 - i]) ;
         std::cout << pos.size() << std::endl ;
         for (int i = 0; i < pos.size(); i ++) {
-            order cur_order = order_read (pos[i]) ;
+            order cur_order; order_read (cur_order, pos[i]) ;
             std::cout << cur_order << std::endl ;
         }
     }
@@ -671,7 +669,7 @@ public:
         for (int i = 0; i < pos.size() / 2; i ++)
             std::swap (pos[i], pos[pos.size() - 1 - i]) ;
         int order_file_pos = pos[num - 1] ;
-        order cur_order = order_read (pos[num - 1]) ;
+        order cur_order; order_read (cur_order, pos[num - 1]) ;
         if (cur_order.getStatus() == refunded) throw "cannot refund" ;
 
         String trainID = cur_order.getTrainID() ;
@@ -688,7 +686,7 @@ public:
             tmp.clear() ;
             pendingOrders.find (data (trainID, 0), tmp) ;
             for (int i = 0; i < tmp.size(); i ++) {
-                order pending_order = order_read (tmp[i]) ;
+                order pending_order; order_read (pending_order, tmp[i]) ;
                 Time pending_startTime = cur_train.getStartTimeFromLeavingTime (pending_order.getLeavingTime(), pending_order.getFromStation()) ;
                 if (pending_order.getSeatNum() <= cur_train.calSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation())) {
                     cur_train.sellSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation(), pending_order.getSeatNum()) ;
