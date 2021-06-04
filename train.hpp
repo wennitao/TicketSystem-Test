@@ -5,16 +5,35 @@
 #include <fstream>
 // #include <assert.h>
 
+#include "seat.hpp"
 #include "string.h"
 #include "time.hpp"
 #include "HashMap.h"
 #include "segmentTree.hpp"
 
+void seat_read (Seat &cur, int pos) {
+    seatio.seekg (pos, std::ios::beg) ;
+    seatio.read (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+}
+
+int seat_write (Seat &cur) {
+    seatio.seekp (0, std::ios::end) ;
+    int pos = seatio.tellp() ;
+    seatio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+    return pos ;
+}
+
+void seat_write (int pos, Seat &cur) {
+    seatio.seekp (pos, std::ios::beg) ;
+    seatio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+}
+
 class train {
 
 private:
     bool released ;
-    int stationNum, seatNum, seat[95][101] ;
+    int stationNum, seatNum ;
+    int seatFilePos[95] ;
     // segmentTree seat[110] ;
     int priceSum[101], travelTimesSum[101], stopoverTimesSum[101] ;
     char type ;
@@ -35,12 +54,12 @@ public:
         type = _type ;
         released = 0 ;
 
-        int days = saleDate[2].daysBetweenTime (saleDate[1]) ;
+        // int days = saleDate[2].daysBetweenTime (saleDate[1]) ;
         // for (int i = 0; i <= days; i ++)
         //     seat[i].build (stationNum, seatNum) ;
-        for (int i = 0; i <= days; i ++)
-            for (int j = 0; j <= stationNum; j ++)
-                seat[i][j] = seatNum ;
+        // for (int i = 0; i <= days; i ++)
+        //     for (int j = 0; j <= stationNum; j ++)
+        //         seat[i][j] = seatNum ;
 
         priceSum[0] = 0 ;
         for (int i = 1; i < stationNum; i ++)
@@ -68,6 +87,13 @@ public:
     void release () {
         if (released) throw "already released" ;
         released = 1 ;
+
+        int days = saleDate[2].daysBetweenTime (saleDate[1]) ;
+        for (int i = 0; i <= days; i ++) {
+            Seat cur (stationNum, seatNum) ;
+            int file_pos = seat_write (cur) ;
+            seatFilePos[i] = file_pos ;
+        }
     }
 
     bool isReleased () {
@@ -179,10 +205,12 @@ public:
         // assert (stations[from_id] == fromStation) ;
         // assert (stations[to_id] == toStation) ;
         // return seat[days].query (from_id, to_id - 1) ;
-        int seats = 1e9 ;
-        for (int i = from_id; i < to_id; i ++)
-            seats = std::min (seats, seat[days][i]) ;
-        return seats ;
+        // int seats = 1e9 ;
+        // for (int i = from_id; i < to_id; i ++)
+        //     seats = std::min (seats, seat[days][i]) ;
+        // return seats ;
+        Seat cur; seat_read (cur, seatFilePos[days]) ;
+        return cur.query (from_id, to_id - 1) ;
     }
 
     void sellSeats (const Time &startTime, const String &fromStation, const String &toStation, const int ticketNum) {
@@ -191,8 +219,11 @@ public:
         // assert (stations[from_id] == fromStation) ;
         // assert (stations[to_id] == toStation) ;
         // seat[days].update (from_id, to_id - 1, -ticketNum) ;
-        for (int i = from_id; i < to_id; i ++)
-            seat[days][i] -= ticketNum ;
+        // for (int i = from_id; i < to_id; i ++)
+        //     seat[days][i] -= ticketNum ;
+        Seat cur; seat_read (cur, seatFilePos[days]) ;
+        cur.add (-ticketNum, from_id, to_id - 1) ;
+        seat_write (seatFilePos[days], cur) ;
     }
 
     void addSeats (const Time &startTime, const String &fromStation, const String &toStation, const int ticketNum) {
@@ -201,22 +232,31 @@ public:
         // assert (stations[from_id] == fromStation) ;
         // assert (stations[to_id] == toStation) ;
         // seat[days].update (from_id, to_id - 1, ticketNum) ;
-        for (int i = from_id; i < to_id; i ++)
-            seat[days][i] += ticketNum ;
+        // for (int i = from_id; i < to_id; i ++)
+        //     seat[days][i] += ticketNum ;
+        Seat cur; seat_read (cur, seatFilePos[days]) ;
+        cur.add (ticketNum, from_id, to_id - 1) ;
+        seat_write (seatFilePos[days], cur) ;
     }
 
     void print (const Time &date) {
         int days = date.daysBetweenTime (saleDate[1]) ;
         Time tim = date ;
         tim.setTime (startTime) ;
+        Seat cur ;
+        if (released) seat_read (cur, seatFilePos[days]) ;
         std::cout << trainID << " " << type << std::endl ;
         for (int i = 1; i <= stationNum; i ++) {
             if (i == 1) {
-                std::cout << stations[i] << " xx-xx xx:xx -> " << tim << " " << priceSum[i - 1] << " " << seat[days][i] << std::endl ;
+                std::cout << stations[i] << " xx-xx xx:xx -> " << tim << " " << priceSum[i - 1] << " " ; //seat[days][i] << std::endl ;
+                if (!released) std::cout << seatNum << std::endl ;
+                else std::cout << cur[i] << std::endl ;
             } else if (i == stationNum) {
                 std::cout << stations[i] << " " << tim + travelTimesSum[i - 1] + stopoverTimesSum[i] << " -> xx-xx xx:xx " << priceSum[i - 1] << " x" << std::endl ; 
             } else {
-                std::cout << stations[i] << " " << tim + travelTimesSum[i - 1] + stopoverTimesSum[i - 1] << " -> " << tim + travelTimesSum[i - 1] + stopoverTimesSum[i] << " " << priceSum[i - 1] << " " << seat[days][i] << std::endl ;
+                std::cout << stations[i] << " " << tim + travelTimesSum[i - 1] + stopoverTimesSum[i - 1] << " -> " << tim + travelTimesSum[i - 1] + stopoverTimesSum[i] << " " << priceSum[i - 1] << " " ; //<< seat[days][i] << std::endl ;
+                if (!released) std::cout << seatNum << std::endl ;
+                else std::cout << cur[i] << std::endl ;
             }
         }
     }
