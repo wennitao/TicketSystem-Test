@@ -32,7 +32,7 @@ private:
             printf("is_leaf:%d cnt:%d par:%d\nson:", is_leaf, keyCnt, par) ;
             for (int i = 0; i <= size; i ++) printf("%d ", son[i]) ;
             cout << endl ;
-            for (int i = 0; i < keyCnt; i ++) cout << key[i].str << " " << key[i].pos << endl ;
+            for (int i = 0; i < keyCnt; i ++) cout << key[i].hash_val << " " << key[i].pos << endl ;
         }
     } ;
 
@@ -96,9 +96,7 @@ public:
     }
 
     void clear (data &tmp) {
-        tmp.str.clear() ;
-        // memset (tmp.str, 0, sizeof tmp.str);
-        tmp.pos = -1 ;
+        tmp.hash_val = 0; tmp.pos = -1 ;
     }
 
     void disk_read (node &cur, int pos) {
@@ -138,16 +136,16 @@ public:
         for (; pos < cur.keyCnt && cur.key[pos] < x; pos ++) ;
         if (cur.is_leaf) {
             for (int i = pos; i < cur.keyCnt; i ++) {
-                if (cur.key[i].str == x.str) res.push_back (cur.key[i].pos) ;
+                if (cur.key[i].hash_val == x.hash_val) res.push_back (cur.key[i].pos) ;
                 else return ;
             }
         } else {
-            if (pos == cur.keyCnt || x.str < cur.key[pos].str) find (cur.son[pos], x, res) ;
+            if (pos == cur.keyCnt || x.hash_val < cur.key[pos].hash_val) find (cur.son[pos], x, res) ;
             else {
                 std::vector<int> tmp ;
                 find (cur.son[pos], x, tmp) ;
                 for (int i = 0; i < tmp.size(); i ++) res.push_back (tmp[i]) ;
-                for (; pos < cur.keyCnt && cur.key[pos].str == x.str; pos ++) {
+                for (; pos < cur.keyCnt && cur.key[pos].hash_val == x.hash_val; pos ++) {
                     tmp.clear() ;
                     find (cur.son[pos + 1], x, tmp) ;
                     for (int i = 0; i < tmp.size(); i ++) res.push_back (tmp[i]) ;
