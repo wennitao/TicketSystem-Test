@@ -23,9 +23,9 @@ private:
         int par, son[size + 3] ;
         data key[size + 1] ;
 
-        node () {
+        node (bool flag = 0) {
             is_leaf = 1; keyCnt = 0; par = -1 ;
-            fill (son, son + size + 3, -1) ;
+            if (flag) fill (son, son + size + 3, -1) ;
         }
 
         void print() {
@@ -75,11 +75,13 @@ public:
     }
 
     bool empty() {
-        return root == -1 || disk_read (root).keyCnt == 0 ;
+        if (root == -1) return 1 ;
+        node tmp; disk_read (tmp, root) ;
+        return tmp.keyCnt == 0 ;
     }
 
     void print (int v) {
-        node cur = disk_read (v) ;
+        node cur; disk_read (cur, v) ;
         printf("pos:%d\n", v) ;
         cur.print() ;
         cout << endl ;
@@ -99,11 +101,9 @@ public:
         tmp.pos = -1 ;
     }
 
-    node disk_read (int pos) {
+    void disk_read (node &cur, int pos) {
         io.seekg (pos + offset, std::ios::beg) ;
-        node cur ;
         io.read (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
-        return cur ;
     }
 
     void disk_write (int pos, node &x) {
@@ -119,7 +119,7 @@ public:
 
     std::pair<int, int> find (int v, const data &x) { //find node == x
         if  (v == -1) return std::make_pair (-1, -1) ;
-        node cur = disk_read (v) ;
+        node cur; disk_read (cur, v) ;
         int pos = 0 ;
         for (; pos < cur.keyCnt && cur.key[pos] < x; pos ++) ;
         if (cur.is_leaf) {
@@ -133,7 +133,7 @@ public:
 
     void find (int v, const data &x, std::vector<int> &res) { //find node == x
         if (v == -1) return ;
-        node cur = disk_read (v) ;
+        node cur; disk_read (cur, v) ;
         int pos = 0 ;
         for (; pos < cur.keyCnt && cur.key[pos] < x; pos ++) ;
         if (cur.is_leaf) {
@@ -162,7 +162,7 @@ public:
     int findKey (const data &x) {
         pair<int, int> pos = find (x) ;
         if (pos.first == -1) return -1 ;
-        node cur = disk_read (pos.first) ;
+        node cur; disk_read (cur, pos.first) ;
         return cur.key[pos.second].pos ;
     }
 
@@ -171,7 +171,7 @@ public:
     }
 
     int search (int v, const data &x) { //find the leaf_node where can insert x
-        node cur = disk_read (v) ;
+        node cur; disk_read (cur, v) ;
         if (cur.is_leaf) return v ;
         int pos = 0 ;
         for (; pos < cur.keyCnt && cur.key[pos] < x; pos ++) ;
@@ -182,7 +182,7 @@ public:
     }
 
     void update_son_fa (int son, int fa) {
-        node cur = disk_read (son) ;
+        node cur; disk_read (cur, son) ;
         cur.par = fa ;
         disk_write (son, cur) ;
     }
@@ -190,14 +190,14 @@ public:
     void insert (int &fa, int lchild, int rchild, const data &x) {
         if (fa == -1) {
             fa = (node_cnt ++) * node_size ;
-            node par_node ;
+            node par_node(1) ;
             par_node.is_leaf = 0; par_node.key[par_node.keyCnt ++] = x ;
             par_node.son[0] = lchild; par_node.son[1] = rchild ;
             update_son_fa (lchild, fa); update_son_fa (rchild, fa) ;
             disk_write (fa, par_node) ;
             root = fa ;
         } else {
-            node par_node = disk_read (fa) ;
+            node par_node; disk_read (par_node, fa) ;
             int pos = 0 ;
             for (; pos < par_node.keyCnt && par_node.key[pos] < x; pos ++) ;
             for (int i = par_node.keyCnt - 1; i >= pos; i --) par_node.key[i + 1] = par_node.key[i] ;
@@ -209,7 +209,7 @@ public:
             if (par_node.keyCnt <= size) {
                 disk_write (fa, par_node) ;
             } else {
-                node nxt_node ;
+                node nxt_node(1) ;
                 nxt_node.is_leaf = 0 ;
                 int nxt_node_pos = (node_cnt ++) * node_size ;
                 for (int i = size / 2 + 1; i < par_node.keyCnt; i ++) {
@@ -234,19 +234,19 @@ public:
 
     void insert (const data &x) {
         if (root == -1) {
-            node cur ;
+            node cur(1) ;
             cur.key[cur.keyCnt ++] = x ;
             root = 0; node_cnt ++ ;
             disk_write (0, cur) ;
         } else {
             int cur_pos = search (root, x) ;
-            node cur = disk_read (cur_pos) ;
+            node cur; disk_read (cur, cur_pos) ;
             cur.key[cur.keyCnt ++] = x ;
             std::sort (cur.key, cur.key + cur.keyCnt) ;
             if (cur.keyCnt <= size) {
                 disk_write (cur_pos, cur) ;
             } else {
-                node nxt ;
+                node nxt(1) ;
                 int nxt_pos = (node_cnt ++) * node_size ;
                 for (int i = size / 2; i < cur.keyCnt; i ++) {
                     nxt.key[nxt.keyCnt ++] = cur.key[i] ;
@@ -262,11 +262,11 @@ public:
     }
 
     void erase_par (int v) {
-        node cur = disk_read (v) ;
+        node cur; disk_read (cur, v) ;
         if (cur.keyCnt >= size / 2) return ;
         int par = cur.par ;
         if (par == -1) return ;
-        node par_node = disk_read (par) ;
+        node par_node; disk_read (par_node, par) ;
         int son_pos = 0 ;
         for (; par_node.son[son_pos] != v; son_pos ++) ;
 
@@ -274,8 +274,8 @@ public:
         if (son_pos > 0) lbro = par_node.son[son_pos - 1] ;
         if (son_pos + 1 <= par_node.keyCnt) rbro = par_node.son[son_pos + 1] ;
         node lbro_node, rbro_node ;
-        if (lbro != -1) lbro_node = disk_read (lbro) ;
-        if (rbro != -1) rbro_node = disk_read (rbro) ;
+        if (lbro != -1) disk_read (lbro_node, lbro) ;
+        if (rbro != -1) disk_read (rbro_node, rbro) ;
 
         if (lbro != -1 && lbro_node.keyCnt > size / 2) { //borrow one from left brother
             for (int i = cur.keyCnt; i >= 1; i --)
@@ -365,7 +365,7 @@ public:
     void erase (const data &x) {
         std::pair<int, int> pos = find (x) ;
         if (pos.first == -1) throw "not found" ;
-        node cur = disk_read (pos.first) ;
+        node cur; disk_read (cur, pos.first) ;
         for (int i = pos.second + 1; i < cur.keyCnt; i ++)
             cur.key[i - 1] = cur.key[i] ;
         clear (cur.key[cur.keyCnt - 1]); cur.keyCnt -- ;
@@ -377,7 +377,7 @@ public:
                 return ;
             }
             int par = cur.par ;
-            node par_node = disk_read (par) ;
+            node par_node; disk_read (par_node, par) ;
             int son_pos = 0 ;
             for (; par_node.son[son_pos] != pos.first; son_pos ++) ;
             int lbro = -1, rbro = -1 ;
@@ -385,8 +385,8 @@ public:
             if (son_pos + 1 <= par_node.keyCnt) rbro = par_node.son[son_pos + 1] ;
             
             node lbro_node, rbro_node ;
-            if (lbro != -1) lbro_node = disk_read (lbro) ;
-            if (rbro != -1) rbro_node = disk_read (rbro) ;
+            if (lbro != -1) disk_read (lbro_node, lbro) ;
+            if (rbro != -1) disk_read (rbro_node, rbro) ;
 
             if (lbro != -1 && lbro_node.keyCnt > size / 2) { //borrow one from left brother
                 for (int i = cur.keyCnt; i >= 1; i --)

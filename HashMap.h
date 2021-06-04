@@ -16,14 +16,14 @@ private:
     struct pair{
     public:
         int first;//站名
-        int second;//序号
+        short second;//序号
         pair(){
             first = 0;
             second = 0;
         }
-        pair(int l , int r):first(l),second(r){};
+        pair(int l , short r):first(l),second(r){};
     };
-    pair order[104];
+    pair order[101];
     int cur = 0;
     void sort(int l , int r){
         int left = l , right = r;
@@ -49,8 +49,8 @@ public:
     void sort(){
         sort(1 , cur);
     }
-    int find (const String &key1) const {
-        unsigned long long hash_val = key1.hashit() ;
+    short find (const String &key1) const {
+        int hash_val = key1.hashit() ;
         int l = 0;
         int r = cur + 1;
         while (l + 1 < r){

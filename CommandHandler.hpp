@@ -43,16 +43,17 @@ public:
         argument[key_cnt][cur_len ++] = 0 ;
     }
 
-    user user_read (int pos) {
+    void user_read (user &cur, int pos) {
         userio.seekg (pos, std::ios::beg) ;
-        user cur ;
         userio.read (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
-        return cur ;
     }
 
     int user_write (user &cur) {
-        userio.seekp (0, std::ios::end) ;
-        int pos = userio.tellp() ;
+        userio.seekg (0, std::ios::end) ;
+        int pos = userio.tellg() ;
+        // int pos = userio.tellg(), file_pos ;
+        // pos -= sizeof (int) ;
+        // userio.read (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
         userio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
         return pos ;
     }
@@ -62,23 +63,55 @@ public:
         userio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
     }
 
-    train train_read (int pos) {
+    void train_read (train &cur, int pos) {
         trainio.seekg (pos, std::ios::beg) ;
-        train cur ;
         trainio.read (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
-        return cur ;
     }
 
     int train_write (train &cur) {
         trainio.seekp (0, std::ios::end) ;
-        int pos = trainio.tellp() ;
-        trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
-        return pos ;
+        int pos = trainio.tellp(), file_pos, nxt_file_pos, res ;
+        pos -= sizeof (int) ;
+        trainio.seekg (pos, std::ios::beg) ;
+        trainio.read (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
+        if (file_pos == -1) {
+            if (pos == 0) trainio.seekp (0, std::ios::beg) ;
+            else trainio.seekp (0, std::ios::end) ;
+            res = trainio.tellp() ;
+            trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+            trainio.seekp (0, std::ios::end) ;
+            trainio.write (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
+            return res ;
+        } else {
+            trainio.seekp (file_pos, std::ios::beg) ;
+            trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+            res = file_pos ;
+            trainio.seekg (file_pos + sizeof (cur), std::ios::beg) ;
+            trainio.read (reinterpret_cast<char *>(&nxt_file_pos), sizeof (nxt_file_pos)) ;
+            trainio.seekp (0, std::ios::end) ;
+            pos = trainio.tellp(); pos -= sizeof (int) ;
+            trainio.seekp (pos, std::ios::beg) ;
+            trainio.write (reinterpret_cast<char *>(&nxt_file_pos), sizeof (nxt_file_pos)) ;
+            return res ;
+        }
     }
 
     void train_write (int pos, train &cur) {
         trainio.seekp (pos, std::ios::beg) ;
         trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+    }
+
+    void train_delete (int pos) {
+        trainio.seekp (0, std::ios::end) ;
+        int tmp = trainio.tellp(); tmp -= sizeof (int) ;
+        int file_pos ;
+        trainio.seekg (tmp, std::ios::beg) ;
+        trainio.read (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
+        trainio.seekp (tmp, std::ios::beg) ;
+        trainio.write (reinterpret_cast<char *>(&pos), sizeof (pos)) ;
+        tmp = pos + sizeof (train) ;
+        trainio.seekp (tmp, std::ios::beg) ;
+        trainio.write (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
     }
 
     order order_read (int pos) {
@@ -158,7 +191,7 @@ public:
             curUsers.find (data (cur_username, 0), pos) ;
             if (pos.empty()) throw "cur user not logged in" ;
 
-            user cur_user = user_read (pos[0]) ;
+            user cur_user; user_read (cur_user, pos[0]) ;
             if (cur_user.getPrivilege() <= privilege) throw "invalid privilege" ;
         }
 
@@ -185,7 +218,7 @@ public:
         if (pos.empty()) throw "username not exists" ;
 
         int user_file_pos = pos[0] ;
-        user cur_user = user_read (user_file_pos) ;
+        user cur_user; user_read (cur_user, user_file_pos) ;
         cur_user.login (password) ;
         curUsers.insert (data (username, user_file_pos)) ;
         printf ("0\n") ;
@@ -215,13 +248,13 @@ public:
         curUsers.find (data (cur_username, 0), pos) ;
         if (pos.empty()) throw "cur user not logged in" ;
         int cur_user_file_pos = pos[0] ;
-        user cur_user = user_read (cur_user_file_pos) ;
+        user cur_user; user_read (cur_user, cur_user_file_pos) ;
 
         pos.clear() ;
         users.find (data (username, 0), pos) ;
         if (pos.empty()) throw "user not found" ;
         int query_user_file_pos = pos[0] ;
-        user query_user = user_read (query_user_file_pos) ;
+        user query_user; user_read (query_user, query_user_file_pos) ;
         if (!(cur_user.getPrivilege() > query_user.getPrivilege() || cur_username == username)) throw "invalid privilege" ;
         
         std::cout << query_user << std::endl ;
@@ -243,13 +276,13 @@ public:
         curUsers.find (data (cur_username, 0), pos) ;
         if (pos.empty()) throw "user enot logged in" ;
         int cur_user_file_pos = pos[0] ;
-        user cur_user = user_read (cur_user_file_pos) ;
+        user cur_user; user_read (cur_user, cur_user_file_pos) ;
         
         pos.clear() ;
         users.find (data (username, 0), pos) ;
         if (pos.empty()) throw "user not found" ;
         int modify_user_file_pos = pos[0] ;
-        user modify_user = user_read (modify_user_file_pos) ;
+        user modify_user; user_read (modify_user, modify_user_file_pos) ;
 
         if (!(cur_user.getPrivilege() > modify_user.getPrivilege() || cur_username == username)) throw "invalid privilege" ;
         if (privilege != -1 && privilege >= cur_user.getPrivilege()) throw "invalid privilege" ;
@@ -337,7 +370,7 @@ public:
         trains.find (data (trainID, 0), pos) ;
         if (pos.empty()) throw "train not found" ;
         int train_file_pos = pos[0] ;
-        train cur_train = train_read (train_file_pos) ;
+        train cur_train; train_read (cur_train, train_file_pos) ;
         cur_train.release() ;
         train_write (train_file_pos, cur_train) ;
 
@@ -356,7 +389,7 @@ public:
         trains.find (data (trainID, 0), pos) ;
         if (pos.empty()) throw "train not found" ;
         int train_file_pos = pos[0] ;
-        train cur_train = train_read (train_file_pos) ;
+        train cur_train; train_read (cur_train, train_file_pos) ;
         if (!cur_train.runningOnDate (date)) throw "train doesn't run on this date" ;
         cur_train.print (date) ;
     }
@@ -371,10 +404,14 @@ public:
         trains.find (data (trainID, 0), pos) ;
         if (pos.empty()) throw "train not found" ;
         int train_file_pos = pos[0] ;
-        train cur_train = train_read (train_file_pos) ;
+        train cur_train; train_read (cur_train, train_file_pos) ;
         if (cur_train.isReleased()) throw "already released" ;
 
+        for (int i = 1; i <= cur_train.getStationNum(); i ++) {
+            trainStations.erase (data (cur_train.getStation(i), train_file_pos)) ;
+        }
         trains.erase (data (trainID, train_file_pos)) ;
+        train_delete (train_file_pos) ;
         printf("0\n") ; 
     }
 
@@ -445,7 +482,7 @@ public:
         // sjtu::vector<order, std::less<int>, cmp_time, cmp_cost> orders ;
         int order_cnt = 0 ;
         for (int i = 0; i < possible_trains.size(); i ++) {
-            train cur_train = train_read (possible_trains[i]) ;
+            train cur_train; train_read (cur_train, possible_trains[i]) ;
             if (!cur_train.isReleased()) continue ;
             if (!cur_train.direction (fromStation, toStation)) continue ;
             if (!cur_train.canDepartFromStationOnDate (date, fromStation)) continue ;
@@ -485,7 +522,7 @@ public:
         order order_1, order_2 ;
 
         for (int i = 0; i < train1_pos.size(); i ++) {
-            train train1 = train_read (train1_pos[i]) ;
+            train train1; train_read (train1, train1_pos[i]) ;
             if (!train1.isReleased()) continue ;
             if (!train1.canDepartFromStationOnDate (date, fromStation)) continue ;
             Time train1_startTime = train1.getStartTime (date, fromStation) ;
@@ -501,7 +538,7 @@ public:
 
                 for (int j = 0; j < train2_pos.size(); j ++) {
                     if (train1_pos[i] == train2_pos[j]) continue ;
-                    train train2 = train_read (train2_pos[j]) ;
+                    train train2; train_read (train2, train2_pos[j]) ;
                     if (!train2.isReleased()) continue ;
                     if (!train2.direction (midStation, toStation)) continue ;
                     if (!train2.canDepartFromStationAferTime (train1_arrivingTime, midStation)) continue ;
@@ -552,13 +589,13 @@ public:
         curUsers.find (data (username, 0), pos) ;
         if (pos.empty()) throw "user not logged in" ;
         int user_file_pos = pos[0] ;
-        user cur_user = user_read (user_file_pos) ;
+        user cur_user; user_read (cur_user, user_file_pos) ;
 
         pos.clear() ;
         trains.find (data (trainID, 0), pos) ;
         if (pos.empty()) throw "train not found" ;
         int train_file_pos = pos[0] ;
-        train cur_train = train_read (train_file_pos) ;
+        train cur_train; train_read (cur_train, train_file_pos) ;
 
         if (!cur_train.isReleased()) throw "train not released" ;
         if (!cur_train.direction (fromStation, toStation)) throw "cannot depart" ;
@@ -644,7 +681,7 @@ public:
             std::vector<int> tmp ;
             trains.find (data (trainID, 0), tmp) ;
             int train_file_pos = tmp[0] ;
-            train cur_train = train_read (train_file_pos) ;
+            train cur_train; train_read (cur_train, train_file_pos) ;
             Time trainStartTime = cur_train.getStartTimeFromLeavingTime (cur_order.getLeavingTime(), cur_order.getFromStation()) ;
             cur_train.addSeats (trainStartTime, cur_order.getFromStation(), cur_order.getToStation(), cur_order.getSeatNum()) ;
 

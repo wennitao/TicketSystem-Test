@@ -33,6 +33,8 @@ void init () {
         out.close() ;
         trainio.open ("trains.dat", std::ios::in | std::ios::out | std::ios::binary) ;
         trainio.seekp (0, std::ios::end) ;
+        int tmp = -1 ;
+        trainio.write (reinterpret_cast<char *>(&tmp), sizeof (tmp)) ;
     }
     in.close() ;
     if (!trainio.is_open()) trainio.open ("trains.dat", std::ios::in | std::ios::out | std::ios::binary) ;
