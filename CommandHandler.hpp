@@ -74,14 +74,46 @@ public:
 
     int train_write (train &cur) {
         trainio.seekp (0, std::ios::end) ;
-        int pos = trainio.tellp() ;
-        trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
-        return pos ;
+        int pos = trainio.tellp(), file_pos, nxt_file_pos, res ;
+        pos -= sizeof (int) ;
+        trainio.seekg (pos, std::ios::beg) ;
+        trainio.read (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
+        if (file_pos == -1) {
+            trainio.seekp (0, std::ios::end) ;
+            trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+            trainio.seekp (0, std::ios::end) ;
+            trainio.write (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
+            return pos ;
+        } else {
+            trainio.seekp (file_pos, std::ios::beg) ;
+            trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+            res = file_pos ;
+            trainio.seekg (file_pos + sizeof (cur), std::ios::beg) ;
+            trainio.read (reinterpret_cast<char *>(&nxt_file_pos), sizeof (nxt_file_pos)) ;
+            trainio.seekp (0, std::ios::end) ;
+            pos = trainio.tellp(); pos -= sizeof (int) ;
+            trainio.seekp (pos, std::ios::beg) ;
+            trainio.write (reinterpret_cast<char *>(&nxt_file_pos), sizeof (nxt_file_pos)) ;
+            return res ;
+        }
     }
 
     void train_write (int pos, train &cur) {
         trainio.seekp (pos, std::ios::beg) ;
         trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+    }
+
+    void train_delete (int pos) {
+        trainio.seekp (0, std::ios::end) ;
+        int tmp = trainio.tellp(); tmp -= sizeof (int) ;
+        int file_pos ;
+        trainio.seekg (tmp, std::ios::beg) ;
+        trainio.read (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
+        trainio.seekp (tmp, std::ios::beg) ;
+        trainio.write (reinterpret_cast<char *>(&pos), sizeof (pos)) ;
+        tmp = pos + sizeof (train) ;
+        trainio.seekp (tmp, std::ios::beg) ;
+        trainio.write (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
     }
 
     order order_read (int pos) {
@@ -378,6 +410,7 @@ public:
         if (cur_train.isReleased()) throw "already released" ;
 
         trains.erase (data (trainID, train_file_pos)) ;
+        train_delete (train_file_pos) ;
         printf("0\n") ; 
     }
 
