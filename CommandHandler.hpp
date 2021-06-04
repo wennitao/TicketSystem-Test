@@ -79,11 +79,13 @@ public:
         trainio.seekg (pos, std::ios::beg) ;
         trainio.read (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
         if (file_pos == -1) {
-            trainio.seekp (0, std::ios::end) ;
+            if (pos == 0) trainio.seekp (0, std::ios::beg) ;
+            else trainio.seekp (0, std::ios::end) ;
+            res = trainio.tellp() ;
             trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
             trainio.seekp (0, std::ios::end) ;
             trainio.write (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
-            return pos ;
+            return res ;
         } else {
             trainio.seekp (file_pos, std::ios::beg) ;
             trainio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
@@ -409,6 +411,9 @@ public:
         train cur_train = train_read (train_file_pos) ;
         if (cur_train.isReleased()) throw "already released" ;
 
+        for (int i = 1; i <= cur_train.getStationNum(); i ++) {
+            trainStations.erase (data (cur_train.getStation(i), train_file_pos)) ;
+        }
         trains.erase (data (trainID, train_file_pos)) ;
         train_delete (train_file_pos) ;
         printf("0\n") ; 
