@@ -56,7 +56,7 @@ public:
         stopoverTimesSum[stationNum] = stopoverTimesSum[stationNum - 1] ;
 
         for (int i = 1; i <= stationNum; i ++) {
-            stationHashMap.insert (stations[i], i) ;
+            stationHashMap.insert (stations[i], (short)i) ;
         }
         stationHashMap.sort() ;
     }

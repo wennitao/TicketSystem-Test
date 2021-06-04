@@ -51,8 +51,11 @@ public:
     }
 
     int user_write (user &cur) {
-        userio.seekp (0, std::ios::end) ;
-        int pos = userio.tellp() ;
+        userio.seekg (0, std::ios::end) ;
+        int pos = userio.tellg() ;
+        // int pos = userio.tellg(), file_pos ;
+        // pos -= sizeof (int) ;
+        // userio.read (reinterpret_cast<char *>(&file_pos), sizeof (file_pos)) ;
         userio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
         return pos ;
     }
