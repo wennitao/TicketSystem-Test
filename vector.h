@@ -282,38 +282,6 @@ namespace sjtu {
             if (right > l)sort(l , right , cmp);
             if (left < r)sort(left , r , cmp);
         }
-//        void sort2(int l , int r , cmp2 Cmp2){
-//            int left = l;
-//            int right = r;
-//            T mid = *data[(l + r) >> 1];
-//            do {
-//                while (Cmp2(*data[left] , mid))left++;
-//                while (Cmp2(mid , *data[right]))right--;
-//                if (left <= right){
-//                    std::swap(data[left] , data[right]);
-//                    left++;
-//                    right--;
-//                }
-//            } while (left <= right);
-//            if (right > l)sort2(l , right , Cmp2);
-//            if (left < r)sort2(left , r , Cmp2);
-//        }
-//        void sort3(int l , int r , cmp3 Cmp3){
-//            int left = l;
-//            int right = r;
-//            T mid = *data[(l + r) >> 1];
-//            do {
-//                while (Cmp3(*data[left] , mid))left++;
-//                while (Cmp3(mid , *data[right]))right--;
-//                if (left <= right){
-//                    std::swap(data[left] , data[right]);
-//                    left++;
-//                    right--;
-//                }
-//            } while (left <= right);
-//            if (right > l)sort3(l , right , Cmp3);
-//            if (left < r)sort3(left , r , Cmp3);
-//        }
     public:
         vector() {
             len = 20;

@@ -183,7 +183,8 @@ public:
             cnt--;
         }
     }
-    Database::node query(const int &pos){
+    Database::node que
+    ry(const int &pos){
         if (!hashmap.exist(pos))return Database::node();
         else {
             twolist.move_to_head(hashmap.find(pos));
