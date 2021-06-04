@@ -3,8 +3,15 @@
 //
 #include <iostream>
 #include "vector.h"
-
-using namespace std;
 int main(){
-
+    sjtu::vector<Num> res;
+    res.push_back(Num(1 , 2));
+    res.push_back(Num(2 , 3));
+    for (int i = 99; i >=3 ; --i) {
+        res.push_back(Num(i , i + 1));
+    }
+    res.sort(compare);
+    for (auto i : res){
+        std::cout << i.a << ' ' << i.b <<std::endl;
+    }
 }
