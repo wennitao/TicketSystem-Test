@@ -11,23 +11,23 @@
 //template<class Key , class Data >//key是站名 ， data是车站内容，即顺序
 class HashMap{
 private:
-    const int size = 105;
+    const int size = 101;
     const int mod = 291143;
     struct pair{
     public:
-        unsigned long long first;//站名
+        int first;//站名
         int second;//序号
         pair(){
             first = 0;
             second = 0;
         }
-        pair(unsigned long long l , int r):first(l),second(r){};
+        pair(int l , int r):first(l),second(r){};
     };
     pair order[104];
     int cur = 0;
     void sort(int l , int r){
         int left = l , right = r;
-        unsigned long long mid = order[(l + r) >> 1].first;
+        int mid = order[(l + r) >> 1].first;
         do{
             while (order[left].first < mid) left++;
             while (order[right].first > mid) right--;

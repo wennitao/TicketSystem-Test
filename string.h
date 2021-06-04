@@ -10,7 +10,7 @@ class String {
     friend std::ostream& operator << (std::ostream &out, const String &str) ;
 
 public:
-    char str[35];
+    char str[32];
     int len = 0;//记录字母个数，有一个记一个
 public:
     String(const char *ch) {
@@ -97,11 +97,12 @@ public:
         res.len = r - l + 1 ;
         return res ;
     }
-    unsigned long long hashit() const {
-        unsigned long long res = 0;
+    int hashit() const {
+        int res = 0;
         for (int i = 0; i < len; ++i) {
-            res = res * 13331 + str[i] ;//-64以避免大小写
+            res = (1ll * res * 13331 + str[i]) % 998244353 ;//-64以避免大小写
         }
+        res = (res + 998244353) % 998244353 ;
         return res;
     }
 };

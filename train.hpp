@@ -14,11 +14,11 @@ class train {
 
 private:
     bool released ;
-    int stationNum, seatNum, seat[110][110] ;
+    int stationNum, seatNum, seat[95][101] ;
     // segmentTree seat[110] ;
-    int priceSum[110], travelTimesSum[110], stopoverTimesSum[110] ;
+    int priceSum[101], travelTimesSum[101], stopoverTimesSum[101] ;
     char type ;
-    String trainID, stations[110] ;
+    String trainID, stations[101] ;
     Time startTime, saleDate[3] ;
 
     HashMap stationHashMap ;
