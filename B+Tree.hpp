@@ -5,10 +5,10 @@
 #include <cstdio>
 #include <fstream>
 #include <algorithm>
-#include <vector>
+// #include <vector>
 
 #include "data.hpp"
-// #include "vector.h"
+#include "vector.h"
 
 const int size = 200 ;
 
@@ -129,7 +129,7 @@ public:
         }
     }
 
-    void find (int v, const data &x, std::vector<int> &res) { //find node == x
+    void find (int v, const data &x, sjtu::vector<int> &res) { //find node == x
         if (v == -1) return ;
         node cur; disk_read (cur, v) ;
         int pos = 0 ;
@@ -142,7 +142,7 @@ public:
         } else {
             if (pos == cur.keyCnt || x.hash_val < cur.key[pos].hash_val) find (cur.son[pos], x, res) ;
             else {
-                std::vector<int> tmp ;
+                sjtu::vector<int> tmp ;
                 find (cur.son[pos], x, tmp) ;
                 for (int i = 0; i < tmp.size(); i ++) res.push_back (tmp[i]) ;
                 for (; pos < cur.keyCnt && cur.key[pos].hash_val == x.hash_val; pos ++) {
@@ -164,7 +164,7 @@ public:
         return cur.key[pos.second].pos ;
     }
 
-    void find (const data &x, std::vector<int> &res) {
+    void find (const data &x, sjtu::vector<int> &res) {
         find (root, x, res) ;
     }
 
