@@ -264,7 +264,7 @@ namespace sjtu {
          * Atleast two: default constructor, copy constructor
          */
     private:
-        void sort(int l , int r , bool* cmp (T & , T &)){
+        void sort(int l , int r , bool(*cmp) (T & , T &)){
             int left = l;
             int right = r;
             T mid = *data[(l + r) >> 1];
@@ -279,8 +279,8 @@ namespace sjtu {
                     right--;
                 }
             } while (left <= right);
-            if (right > l)sort1(l , right , cmp);
-            if (left < r)sort1(left , r , cmp);
+            if (right > l)sort(l , right , cmp);
+            if (left < r)sort(left , r , cmp);
         }
 //        void sort2(int l , int r , cmp2 Cmp2){
 //            int left = l;
@@ -331,13 +331,13 @@ namespace sjtu {
             for (int i = cur; i < len; ++i) {
                 data[i] = nullptr;
             }
-        }
-        vector(vector &&rhs) noexcept {
+        };
+        vector(vector &&rhs)  noexcept {
             len = rhs.len;
             cur = rhs.cur;
             data = rhs.data;
             rhs.data = nullptr;
-        }
+        };
         /**
          * TODO Destructor
          */
@@ -548,7 +548,7 @@ namespace sjtu {
         }
 
         //下面是快排完成sort;
-        void sort(bool* cmp (T & , T &)){
+        void sort(bool(*cmp) (T & , T &)){
             sort(0 , cur - 1 , cmp);
         }
 //        void sort2(){
