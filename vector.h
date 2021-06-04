@@ -265,6 +265,7 @@ namespace sjtu {
          */
     private:
         void sort(int l , int r , bool(*cmp) (T & , T &)){
+            if (l >= r)return;
             int left = l;
             int right = r;
             T mid = *data[(l + r) >> 1];
@@ -300,7 +301,7 @@ namespace sjtu {
                 data[i] = nullptr;
             }
         };
-        vector(vector &&rhs)  noexcept {
+        vector(vector &&rhs)  {
             len = rhs.len;
             cur = rhs.cur;
             data = rhs.data;
@@ -535,8 +536,8 @@ public:
     int b;
     Num(const int x , const int y):a(x) , b(y){};
 };
-bool compare(Num &x , Num &y){
-    if (x.a != y.a)return x.b < y.b;
-    else return x.a < y.a;
-}
+//bool compare(Num &x , Num &y){
+//    if (x.a != y.a)return x.b < y.b;
+//    else return x.a < y.a;
+//}
 #endif //TICKETSYSTEM_VECTOR_H

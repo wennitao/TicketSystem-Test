@@ -14,7 +14,7 @@
 
 using namespace std;
 int s[10001000] ;
-String ss[100000];
+String ss[1000000];
 int num[5000000];
 int main() {
     //for (int t = 0; ; t ++) {
@@ -26,17 +26,16 @@ int main() {
     int seed = 1611837369 ;
     srand (seed) ;
     memset (s, 0, sizeof s) ;
-    int n = 3000;
+    int n = 3000000;
     for (int i = 1; i <= n; i ++) {
         //ss[i] = i;
-        int qq = rand() % 5001;
-        num[qq] += i;
+        int qq = rand() % 5000000;
+        num[qq] ++;
         s[i] = qq;
-        for (int j = 1; j <= i; ++j) {
-            test.insert (data (s[i], j));
-        }
+        test.insert(data(s[i] , i));
         //test.printroot();
     }
+
     //test.print();
 //    for (int i = 1; i <= n; i ++) {
 //        test.erase (data  (s[i], i)) ;
@@ -52,8 +51,7 @@ int main() {
     for (int i = 1; i <= n; ++i) {
         vector<int> res;
         test.find(data(s[i] , i) , res);
-        if (res.empty() || res.size() != num[s[i]])cout << i << endl;
-        res.clear();
+        if (res.size() != num[s[i]])cout << i << endl;
     }
 
 //    char ch[60] = "A basing bape";

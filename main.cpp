@@ -61,6 +61,7 @@ void init () {
 }
 
 int main() {
+    freopen("1.in" , "r" , stdin);
     init () ;
     std::string op ;
     while (getline (std::cin, op)) {

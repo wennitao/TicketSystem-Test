@@ -24,7 +24,7 @@ private:
         int fa;
         int lbro;
         int rbro;
-        int son[size + 3]{};
+        int son[size + 3];
         data key[size + 1];
 
         node(){
@@ -33,8 +33,8 @@ private:
             fa = -1;
             lbro = -1;
             rbro = -1;
-            for (int & i : son) {
-                i = -1;
+            for (int i = 0 ; i < size + 3 ; ++i) {
+                son[i] = -1;
             }
 
         }

@@ -17,14 +17,15 @@ public:
     String(const char *ch) {
         // assert (strlen (ch) < 35) ;
         strcpy (str, ch) ;
-        len = strlen (ch); str[len] = '\0' ;
+        len = strlen (ch);
+        str[len] = '\0' ;
         hash_val = 0 ;
         for (int i = 0; i < len; ++i) {
             hash_val = (1ll * hash_val * 13331 + str[i]) % 998244353 ;
         }
         hash_val = (hash_val + 998244353) % 998244353 ;
     }
-    String(){
+    String():hash_val(0),len(0){
         memset(str , 0 , sizeof str);
     }
     String(const String &ot) {
@@ -42,11 +43,27 @@ public:
             return *this;
         }
         len = ot.len;
-        strcpy (str, ot.str);
+        for (int i = 0; i < ot.len; ++i) {
+            str[i] = ot.str[i];
+        }
+        //strcpy (str, ot.str);
         str[len] = '\0' ;
         hash_val = ot.hash_val ;
         return *this;
     }
+//    String& operator=(String ot){
+//        if (this == &ot){
+//            return *this;
+//        }
+//        len = ot.len;
+//        for (int i = 0; i < ot.len; ++i) {
+//            str[i] = ot.str[i];
+//        }
+//        //strcpy (str, ot.str);
+//        str[len] = '\0' ;
+//        hash_val = ot.hash_val ;
+//        return *this;
+//    }
     String& operator = (const char *_str) {
         strcpy (str, _str) ;
         len = strlen (_str) ;
