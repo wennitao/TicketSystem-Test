@@ -3,8 +3,8 @@
 ////
 #include <iostream>
 #include "data.hpp"
-#include "Bpt_and_database.h"
-//#include "_BPlulusTree.h"
+//#include "Bpt_and_database.h"
+#include "B+Tree.hpp"
 #include <string>
 #include <cstring>
 #include <vector>
@@ -13,7 +13,7 @@
 
 
 using namespace std;
-int s[10001000] ;
+int s[1000100] ;
 String ss[1000000];
 int num[5000000];
 int main() {
@@ -21,15 +21,15 @@ int main() {
     //printf("Test %d\n", t) ;
     //system ("rm *.dat") ;
 //    freopen("out.txt", "w" , stdout);
-    Database test ("test.txt") ;
+    BPlusTree test ("test1.txt") ;
     //int seed = time (0) ;
     int seed = 1611837369 ;
     srand (time(0));
     memset (s, 0, sizeof s) ;
-    int n = 300000;
+    int n = 3000;
     for (int i = 1; i <= n; i ++) {
         //ss[i] = i;
-        int qq = rand() % 5000;
+        int qq = rand() % 50;
         num[qq] ++;
         s[i] = qq;
         test.insert(data(s[i] , i));
@@ -50,13 +50,14 @@ int main() {
 //        }
     for (int i = 1; i <= n; ++i) {
         int dd = rand() % (n + 1);
-        test.erase(data(s[dd] , i));
+        test.erase(data(s[dd] , dd));
         num[s[dd]] --;
         sjtu::vector<int> res;
-        test.find(data(s[dd] , i) , res);
-        if (num[s[dd]] >= 0 && res.size() != num[s[i]]){
-            cout << i << endl;
+        test.find(data(s[dd] , dd) , res);
+        if (num[s[dd]] >= 0 && res.size() != num[s[dd]]){
+            cout << i << ' ' << res.size() << endl;
         }
+        res.clear();
     }
 
 //    char ch[60] = "A basing bape";

@@ -362,7 +362,7 @@ public:
 
     void erase (const data &x) {
         std::pair<int, int> pos = find (x) ;
-        if (pos.first == -1) throw "not found" ;
+        if (pos.first == -1) return;
         node cur; disk_read (cur, pos.first) ;
         for (int i = pos.second + 1; i < cur.keyCnt; i ++)
             cur.key[i - 1] = cur.key[i] ;
