@@ -6,10 +6,8 @@
 #include <iostream>
 #include <fstream>
 #include <cstring>
-#include <vector>
-
 #include "string.h"
-// #include "vector.h"
+#include "vector.h"
 #include "data.hpp"
 //using std::vector;
 void insert_sort(data *a , int num , const data &Isert){//二分法插入排序
@@ -171,10 +169,10 @@ std::pair<int, int> Database::find(int nod, const data &x) {
         else return find(cur.son[pos + 1] , x);
     }
 };
-void Database::find(const data &x, std::vector<int> &cap) {
+void Database::find(const data &x, sjtu::vector<int> &cap) {
     find (root , x , cap);
 };
-void Database::find(int nod, const data &x, std::vector<int> &cap) {
+void Database::find(int nod, const data &x, sjtu::vector<int> &cap) {
 //    if (nod == -1) return;
 //    node cur = disk_read(nod);
 //    int pos = 0;
@@ -206,11 +204,11 @@ void Database::find(int nod, const data &x, std::vector<int> &cap) {
 
     while (!cur.is_leaf){
         int pos = 0;
-        for (;pos < cur.keycnt && cur.key[pos].str < x.str ; pos++);
+        for (;pos < cur.keycnt && cur.key[pos].hash_val < x.hash_val ; pos++);
         cur = disk_read(cur.son[pos]);
     }
     int pos = 0;
-    while (pos < cur.keycnt && cur.key[pos].str < x.str){
+    while (pos < cur.keycnt && cur.key[pos].hash_val < x.hash_val){
         if (pos == cur.keycnt - 1){
             if (cur.rbro != -1){cur = disk_read(cur.rbro);pos = 0;}
             else return;
@@ -225,7 +223,7 @@ void Database::find(int nod, const data &x, std::vector<int> &cap) {
 //        cap.push_back(cur.key[pos].pos);
 //        pos++;
 //    }
-    while (pos < cur.keycnt && cur.key[pos].str == x.str){
+    while (pos < cur.keycnt && cur.key[pos].hash_val == x.hash_val){
         cap.push_back(cur.key[pos].pos);
         if (pos == cur.keycnt - 1){
             if (cur.rbro != -1){
@@ -245,7 +243,7 @@ int Database::search(int nod, const data &x) {//find the leaf_node where can ins
     else return search(cur.son[pos + 1] , x);
 };
 void Database::clear(data &tmp) {
-    tmp.str.clear() ;
+    tmp.hash_val = 0;
     // memset(tmp.str , 0 , sizeof(tmp.str));
     tmp.pos = -1;
 };
@@ -399,7 +397,8 @@ void Database::checkpapa(int pa) {
 }
 void Database::erase(const data &x) {
     std::pair<int, int> pos = find(x);
-    if (pos.first == -1) throw "not found";//这个地方要不要改为返回？
+    //if (pos.first == -1) throw "not found";//这个地方要不要改为返回？
+    if (pos.first == -1)return;
     node cur = disk_read(pos.first);
     for (int i = pos.second; i < cur.keycnt - 1; ++i) {
         cur.key[i] = cur.key[i + 1];
@@ -473,6 +472,8 @@ void Database::erase(const data &x) {
                     lbro_node.key[lbro_node.keycnt + i] = cur.key[i];
                 }//cur是被删掉的
                 lbro_node.rbro = rbro;
+                cur.lbro = -1;
+                cur.rbro = -1;
                 if (rbro != -1){
                     rbro_node.lbro = lbro;
                     disk_write(rbro , rbro_node);
@@ -504,8 +505,10 @@ void Database::erase(const data &x) {
                 }
                 cur.keycnt += rbro_node.keycnt;
                 rbro_node.keycnt = 0;
+                rbro_node.lbro = -1;
+                rbro_node.rbro = -1;
                 //此处也要增加缓存
-                disk_write(right_fa , par_node);
+                disk_write(cur.fa , par_node);
                 disk_write(pos.first , cur);
                 disk_write(rbro , rbro_node);
             }

@@ -3,4 +3,4 @@ project(code)
 
 set(CXX_FLAGS -std=c++11 -Ofast)
 
-add_executable(code data.hpp string.cpp user.hpp HashMap.h cache.h main.cpp)
+add_executable(code data.hpp string.cpp user.hpp HashMap.h cache.h Bptest.cpp Bpt_and_database.cpp Bpt_and_database.h)

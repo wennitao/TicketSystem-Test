@@ -24,12 +24,12 @@ int main() {
     Database test ("test.txt") ;
     //int seed = time (0) ;
     int seed = 1611837369 ;
-    srand (seed) ;
+    srand (time(0));
     memset (s, 0, sizeof s) ;
-    int n = 3000000;
+    int n = 300000;
     for (int i = 1; i <= n; i ++) {
         //ss[i] = i;
-        int qq = rand() % 5000000;
+        int qq = rand() % 5000;
         num[qq] ++;
         s[i] = qq;
         test.insert(data(s[i] , i));
@@ -49,9 +49,14 @@ int main() {
 //            return 0 ;
 //        }
     for (int i = 1; i <= n; ++i) {
-        vector<int> res;
-        test.find(data(s[i] , i) , res);
-        if (res.size() != num[s[i]])cout << i << endl;
+        int dd = rand() % (n + 1);
+        test.erase(data(s[dd] , i));
+        num[s[dd]] --;
+        sjtu::vector<int> res;
+        test.find(data(s[dd] , i) , res);
+        if (num[s[dd]] >= 0 && res.size() != num[s[i]]){
+            cout << i << endl;
+        }
     }
 
 //    char ch[60] = "A basing bape";
