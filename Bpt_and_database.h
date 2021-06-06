@@ -24,6 +24,7 @@ private:
         int fa;
         int lbro;
         int rbro;
+        int nxt;
         int son[size + 3];
         data key[size + 1];
 
@@ -86,6 +87,8 @@ public:
     //void erase_par(int nod);
     void erase(const data &x);
     data findmin(int nod);
+    void add_tmp(int pos);
+    int have_tmp();
 };
 
 

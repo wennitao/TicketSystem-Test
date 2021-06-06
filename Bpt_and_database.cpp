@@ -78,7 +78,9 @@ void Database::insert(const data &x) {
         if (cur.keycnt <= maxkey) disk_write(tmp_pos , cur);//先插再分裂
         else {
             node nxt;
-            int nxt_pos = (nodenum ++ ) * node_size ;
+            int nxt_pos = -1;
+            if (have_tmp() == -1) nxt_pos = (nodenum ++ ) * node_size ;
+            else nxt_pos = have_tmp();
             for (int i = maxkey / 2; i < cur.keycnt; ++i) {
                 nxt.key[nxt.keycnt ++] = cur.key[i];
                 clear(cur.key[i]);
@@ -101,7 +103,8 @@ void Database::insert(const data &x) {
 };
 void Database::insert(int &pa, int lchild, int rchild, const data &x) {
     if (pa == -1){
-        pa = (nodenum ++) * node_size;
+        if (have_tmp() == -1)pa = (nodenum ++) * node_size;
+        else pa = have_tmp();
         node pa_node;
         pa_node.is_leaf = false;
         pa_node.key[pa_node.keycnt++] = x;
@@ -132,7 +135,9 @@ void Database::insert(int &pa, int lchild, int rchild, const data &x) {
         } else {
             node nxt_node;
             nxt_node.is_leaf = false;
-            int nxt_pos = (nodenum ++) * node_size;
+            int nxt_pos = -1;
+            if (have_tmp() == -1)nxt_pos = (nodenum ++) * node_size;
+            else nxt_pos = have_tmp();
             for (int i = maxkey / 2 + 1; i < pa_node.keycnt; ++i) {
                 nxt_node.key[nxt_node.keycnt ++] = pa_node.key[i];
                 clear(pa_node.key[i]);
@@ -349,10 +354,13 @@ void Database::checkpapa(int pa) {
         gpar_node.son[gpar_node.keycnt] = -1;
         gpar_node.keycnt--;
         //cur被删了，此处可加缓存
+        add_tmp(pa);
         if (gpar == root && gpar_node.keycnt == 0){
             root = luncle;
             lun_node.fa = -1;
+            lun_node.nxt = gpar_node.nxt;
             update_root();
+            add_tmp(gpar);
             //此处gpar也被删了可加缓存
         }
         disk_write(pa , cur);
@@ -374,6 +382,7 @@ void Database::checkpapa(int pa) {
             update_son_fa(run_node.son[i] , pa);
         }
         //删除了run_node可加缓存
+        add_tmp(runcle);
         for (int i = pa_pos; i < gpar_node.keycnt - 1; ++i) {
             gpar_node.key[i] = gpar_node.key[i + 1];
         }
@@ -386,7 +395,9 @@ void Database::checkpapa(int pa) {
         if(gpar == root && gpar_node.keycnt == 0){
             root = pa;
             cur.fa = -1;
+            cur.nxt = gpar_node.nxt;
             update_root();
+            add_tmp(gpar);
             //此处也可加gpar的缓存
         }
         disk_write(pa , cur);
@@ -481,6 +492,7 @@ void Database::erase(const data &x) {
                 lbro_node.keycnt += cur.keycnt;
                 cur.keycnt = 0;
                 //此处增加缓存
+                add_tmp(pos.first);
                 disk_write(left_fa , par_node);
                 disk_write(lbro , lbro_node);
                 disk_write(pos.first , cur);
@@ -508,6 +520,7 @@ void Database::erase(const data &x) {
                 rbro_node.lbro = -1;
                 rbro_node.rbro = -1;
                 //此处也要增加缓存
+                add_tmp(rbro);
                 disk_write(cur.fa , par_node);
                 disk_write(pos.first , cur);
                 disk_write(rbro , rbro_node);
@@ -547,3 +560,23 @@ void Database::update_son_fa(int son, int pa) {
     cur.fa = pa;
     disk_write(son , cur);
 };
+void Database::add_tmp(int pos) {
+    node cur = disk_read(root);
+    int cur_pos = root;
+    while (cur.nxt != -1){
+        cur_pos = cur.nxt;
+        cur = disk_read(cur.nxt);
+    }
+    cur.nxt = pos;
+    disk_write(cur_pos , cur);
+}
+int Database::have_tmp() {
+    node rt = disk_read(root);
+    if (rt.nxt == -1)return -1;
+    else {
+        int res = rt.nxt;
+        node cur = disk_read(rt.nxt);
+        rt.nxt = cur.nxt;
+        return res;
+    }
+}
