@@ -13,7 +13,7 @@
 // #include "vector.h"
 #include "string.h"
 #include "data.hpp"//size 即m为B+树阶数：最多有几个儿子
-
+//#include "cache.h"
 const int size = 100;
 const int maxkey = size - 1;//单个节点最多能存多少key
 class Database {
@@ -47,6 +47,7 @@ private:
     int nodenum = 0;//0-based
     const int node_size = sizeof (node);
     const int init_offset = 2 * sizeof (int);//跳过存root与nodenum的地址
+
 public:
     Database(const char* file){
         strcpy(file_name , file);
