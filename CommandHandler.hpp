@@ -8,8 +8,8 @@
 // #include <algorithm>
 
 #include "main.h"
-#include "Bpt_and_database.h"
-//#include "B+Tree.hpp"
+// #include "Bpt_and_database.h"
+#include "B+Tree.hpp"
 #include "data.hpp"
 #include "string.h"
 #include "vector.h"
@@ -23,7 +23,7 @@ class CommandHandler {
 private:
     std::string op ;
     char argument[30][10010] ;
-    int key_cnt = 1 ;
+    int key_cnt = 1, timeStamp ;
 
 public:
     CommandHandler (const std::string _op) {
@@ -32,10 +32,18 @@ public:
     }
 
     void analyze () {
+        bool isTimeStamp = 0 ;
         int cur_len = 0 ;
         for (int i = 0; i < op.length(); i ++) {
             if (op[i] == ' ') {
-                argument[key_cnt][cur_len ++] = 0; key_cnt ++; cur_len = 0 ;
+                if (isTimeStamp) {
+                    timeStamp = 0 ;
+                    for (int i = 0; i < cur_len; i ++)
+                        timeStamp = timeStamp * 10 + argument[key_cnt][i] - '0' ;
+                    cur_len = 0; isTimeStamp = 0 ;
+                } else {
+                    argument[key_cnt][cur_len ++] = 0; key_cnt ++; cur_len = 0 ;
+                }
             } else {
                 argument[key_cnt][cur_len ++] = op[i] ;
             }
@@ -134,6 +142,9 @@ public:
     void run () {
         try {
             analyze () ;
+            // printf("%d ", timeStamp) ;
+            // for (int i = 1; i <= key_cnt; i ++) printf("%s ", argument[i]) ;
+            // printf("\n") ;
             if (strcmp (argument[1], "add_user") == 0) {
                 add_user () ;
             } else if (strcmp (argument[1], "login") == 0) {
