@@ -16,7 +16,6 @@ using namespace std;
 
 class BPlusTree {
 private:
-    
     struct node {
         bool is_leaf ;
         int keyCnt ;
