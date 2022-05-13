@@ -1,9 +1,12 @@
 #ifndef TicketSystem_CommandHandler
 #define TicketSystem_CommandHandler
 
+#define debug
+
 #include <iostream>
 #include <fstream>
 #include <cstring>
+#include <sstream>
 // #include <vector>
 // #include <algorithm>
 
@@ -19,11 +22,14 @@
 #include "time.hpp"
 #include "order.hpp"
 
+#include "log.hpp"
+
 class CommandHandler {
 private:
     std::string op ;
     char argument[30][10010] ;
-    int key_cnt = 1, timeStamp ;
+    int key_cnt = 1, timeStamp = 0 ;
+    bool isRollback = false ;
 
 public:
     CommandHandler (const std::string _op) {
@@ -32,13 +38,13 @@ public:
     }
 
     void analyze () {
-        bool isTimeStamp = 0 ;
-        int cur_len = 0 ;
+        bool isTimeStamp = 1 ;
+        key_cnt = 1; int cur_len = 0 ;
         for (int i = 0; i < op.length(); i ++) {
             if (op[i] == ' ') {
                 if (isTimeStamp) {
                     timeStamp = 0 ;
-                    for (int i = 0; i < cur_len; i ++)
+                    for (int i = 1; i < cur_len - 1; i ++)
                         timeStamp = timeStamp * 10 + argument[key_cnt][i] - '0' ;
                     cur_len = 0; isTimeStamp = 0 ;
                 } else {
@@ -139,6 +145,31 @@ public:
         orderio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
     }
 
+    void log_read (log &cur, int pos) {
+        logio.seekg (pos, std::ios::beg) ;
+        logio.read (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
+    }
+
+    void update_last_log_pos (int pos) {
+        logio.seekp (0, std::ios::beg) ;
+        logio.write (reinterpret_cast<char *>(&pos), sizeof pos) ;
+    }
+
+    int get_last_log_pos () {
+        int pos ;
+        logio.seekg (0, std::ios::beg) ;
+        logio.read (reinterpret_cast<char *>(&pos), sizeof pos) ;
+        return pos ;
+    }
+
+    void log_write (log &cur) {
+        logio.seekp (0, std::ios::end) ;
+        int curPos = logio.tellp() ;
+        logio.write (reinterpret_cast<char *>(&cur), sizeof cur) ;
+        logio.seekp (0, std::ios::beg) ;
+        logio.write (reinterpret_cast<char *>(&curPos), sizeof curPos) ;
+    }
+
     void run () {
         try {
             analyze () ;
@@ -147,6 +178,8 @@ public:
             // printf("\n") ;
             if (strcmp (argument[1], "add_user") == 0) {
                 add_user () ;
+            } else if (strcmp (argument[1], "delete_user") == 0) {
+                delete_user () ;
             } else if (strcmp (argument[1], "login") == 0) {
                 login () ;
             } else if (strcmp (argument[1], "logout") == 0) {
@@ -159,6 +192,8 @@ public:
                 add_train () ;
             } else if (strcmp (argument[1], "release_train") == 0) {
                 release_train() ;
+            } else if (strcmp (argument[1], "unrelease_train") == 0) {
+                unrelease_train () ;
             } else if (strcmp (argument[1], "query_train") == 0) {
                 query_train () ;
             } else if (strcmp (argument[1], "delete_train") == 0) {
@@ -173,8 +208,12 @@ public:
                 query_order () ;
             } else if (strcmp (argument[1], "refund_ticket") == 0) {
                 refund_ticket () ;
+            } else if (strcmp (argument[1], "rollback") == 0) {
+                rollback () ;
             } else if (strcmp (argument[1], "clean") == 0) {
                 clean() ;
+            } else if (strcmp (argument[1], "exit") == 0) {
+                isExit = 1 ;
             }
         } catch (...) {
             printf("-1\n") ;
@@ -210,7 +249,31 @@ public:
         user new_user = user (username, password, name, mailAddr, privilege) ;
         int write_pos = user_write (new_user) ;
         users.insert (data (username, write_pos)) ;
-        printf ("0\n") ;
+
+        if (!isRollback) {
+            printf ("0\n") ;
+
+            std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
+            logStr += "delete_user -u " ;
+            for (int i = 0; i < username.len; i ++)
+                logStr = logStr + username.str[i] ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+                curLog.print() ;
+            #endif
+            log_write (curLog) ;
+        }
+    }
+
+    void delete_user () {
+        String username ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'u') username = argument[i + 1] ;
+        }
+        sjtu::vector<int> pos ;
+        users.find (data (username, 0), pos) ;
+        users.erase (data (username, pos[0])) ;
     }
 
     void login () {
@@ -230,7 +293,21 @@ public:
         user cur_user; user_read (cur_user, user_file_pos) ;
         cur_user.login (password) ;
         curUsers.insert (data (username, user_file_pos)) ;
-        printf ("0\n") ;
+
+        if (!isRollback) {
+            printf ("0\n") ;
+
+            std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ; 
+            logStr += "logout -u " ;
+            for (int i = 0; i < username.len; i ++)
+                logStr = logStr + username.str[i] ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
+            log_write (curLog) ;
+        }
     }
 
     void logout () {
@@ -243,7 +320,20 @@ public:
         if (pos.empty()) throw "cur user not logged in" ;
         int user_file_pos = pos[0] ;
         curUsers.erase (data (username, user_file_pos)) ;
-        printf ("0\n") ;
+        if (!isRollback) {
+            printf ("0\n") ;
+
+            std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
+            logStr += "login -u " ;
+            for (int i = 0; i < username.len; i ++)
+                logStr = logStr + username.str[i] ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
+            log_write (curLog) ;
+        }
     }
 
     void query_profile () {
@@ -296,6 +386,22 @@ public:
         if (!(cur_user.getPrivilege() > modify_user.getPrivilege() || cur_username == username)) throw "invalid privilege" ;
         if (privilege != -1 && privilege >= cur_user.getPrivilege()) throw "invalid privilege" ;
 
+        if (!isRollback) {
+            std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
+            logStr += "modify_profile -u " ;
+            logStr = logStr + username.str ;
+            if (!password.empty()) logStr = logStr + " -p " + cur_user.getPassword().str ;
+            if (!name.empty()) logStr = logStr + " -n " + cur_user.getName().str ;
+            if (!mailAddr.empty()) logStr = logStr + " -m " + cur_user.getMailAddress().str ;
+            if (privilege != -1) logStr = logStr + " -g " + int_to_str (cur_user.getPrivilege()).str ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
+            log_write (curLog) ;
+        }
+
         if (!password.empty()) modify_user.modifyPassword (password) ;
         if (!name.empty()) modify_user.modifyName (name) ;
         if (!mailAddr.empty()) modify_user.modifyMailAddress (mailAddr) ;
@@ -303,6 +409,16 @@ public:
         user_write (modify_user_file_pos, modify_user) ;
 
         std::cout << modify_user << std::endl ;
+    }
+
+    String int_to_str (int x) {
+        std::string str ;
+        while (x) {
+            str = str + (char)(x % 10 + '0') ;
+            x /= 10 ;
+        }
+        reverse (str.begin(), str.end()) ;
+        return String (str.c_str()) ;
     }
 
     void split_String (String *res, char *str) {
@@ -336,6 +452,7 @@ public:
         int stationNum, seatNum, prices[110], travelTimes[110], stopoverTimes[110] ;
         String trainID, stations[110] ;
         char type ;
+        String startTimeStr, saleDateStr ;
         Time startTime, saleDate[3] ;
 
         for (int i = 2; i <= key_cnt; i += 2) {
@@ -344,11 +461,12 @@ public:
             else if (argument[i][1] == 'm') seatNum = String (argument[i + 1]).toInt() ;
             else if (argument[i][1] == 's') split_String (stations, argument[i + 1]) ;
             else if (argument[i][1] == 'p') split_int (prices, argument[i + 1]) ;
-            else if (argument[i][1] == 'x') startTime = Time (0, argument[i + 1]) ;
+            else if (argument[i][1] == 'x') startTime = Time (0, argument[i + 1]), startTimeStr = argument[i + 1] ;
             else if (argument[i][1] == 't') split_int (travelTimes, argument[i + 1]) ;
             else if (argument[i][1] == 'o') split_int (stopoverTimes, argument[i + 1]) ;
             else if (argument[i][1] == 'd') {
                 String tmp = argument[i + 1] ;
+                saleDateStr = tmp ;
                 saleDate[1] = Time (tmp.substr (0, 4), 0); saleDate[2] = Time (tmp.substr (6, 10), 0) ;
             }
             else if (argument[i][1] == 'y') type = argument[i + 1][0] ;
@@ -359,6 +477,7 @@ public:
         if (!pos.empty()) throw "train already exists" ;
         
         train new_train = train (trainID, stationNum, stations, seatNum, prices, startTime, travelTimes, stopoverTimes, saleDate, type) ;
+        new_train.startTimeStr = startTimeStr; new_train.saleDateStr = saleDateStr ;
         int train_file_pos = train_write (new_train) ;
         trains.insert (data (trainID, train_file_pos)) ;
 
@@ -366,7 +485,19 @@ public:
             trainStations.insert (data (stations[i], train_file_pos)) ;
         }
 
-        printf("0\n") ;
+        if (!isRollback) {
+            printf("0\n") ;
+
+            std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
+            logStr += "delete_train -i " ;
+            logStr = logStr + trainID.str ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
+            log_write (curLog) ;
+        }
     }
 
     void release_train () {
@@ -383,7 +514,34 @@ public:
         cur_train.release() ;
         train_write (train_file_pos, cur_train) ;
 
-        printf("0\n") ;
+        if (!isRollback) {
+            printf("0\n") ;
+
+            std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
+            logStr += "unrelease_train -i " ;
+            logStr = logStr + trainID.str ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
+            log_write (curLog) ;
+        }
+    }
+
+    void unrelease_train() {
+        String trainID ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'i') trainID = argument[i + 1] ;
+        }
+
+        sjtu::vector<int> pos ;
+        trains.find (data (trainID, 0), pos) ;
+        if (pos.empty()) throw "train not found" ;
+        int train_file_pos = pos[0] ;
+        train cur_train; train_read (cur_train, train_file_pos) ;
+        cur_train.unrelease() ;
+        train_write (train_file_pos, cur_train) ;
     }
 
     void query_train () {
@@ -421,7 +579,37 @@ public:
         }
         trains.erase (data (trainID, train_file_pos)) ;
         train_delete (train_file_pos) ;
-        printf("0\n") ; 
+
+        if (!isRollback) {
+            printf("0\n") ; 
+
+            std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
+            logStr += "add_train -i " ;
+            logStr = logStr + trainID.str ;
+            logStr = logStr + " -n " + int_to_str (cur_train.getStationNum()).str ;
+            logStr = logStr + " -m " + int_to_str (cur_train.getSeatNum()).str ;
+            logStr = logStr + " -s " ;
+            for (int i = 1; i <= cur_train.getStationNum(); i ++)
+                logStr = logStr + cur_train.getStation(i).str + (i == cur_train.getStationNum() ? "" : "|") ;
+            logStr = logStr + " -p " ;
+            for (int i = 1; i < cur_train.getStationNum(); i ++)
+                logStr = logStr + int_to_str (cur_train.getPrice(i)).str + (i == cur_train.getStationNum() - 1 ? "" : "|") ;
+            logStr = logStr + " -x " + cur_train.startTimeStr.str ;
+            logStr = logStr + " -t " ;
+            for (int i = 1; i < cur_train.getStationNum(); i ++)
+                logStr = logStr + int_to_str (cur_train.getTravellingTime(i)).str + (i == cur_train.getStationNum() - 1 ? "" : "|") ;
+            logStr = logStr + " -o " ;
+            for (int i = 2; i < cur_train.getStationNum(); i ++)
+                logStr = logStr + int_to_str (cur_train.getStopoverTime(i)).str + (i == cur_train.getStationNum() - 1 ? "" : "|") ;
+            logStr = logStr + " -d " + cur_train.saleDateStr.str ;
+            logStr = logStr + " -y " + cur_train.getType() ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
+            log_write (curLog) ;
+        }
     }
 
     // class cmp_time {
@@ -628,12 +816,49 @@ public:
             int order_file_pos = order_write (cur_order) ;
             orders.insert (data (username, order_file_pos)) ;
             printf("%lld\n", 1ll * ticketNum * cur_train.calPrice (fromStation, toStation)) ;
+
+            std::stringstream s ;
+            s << "[" << timeStamp << "] " ;
+            s << "add_train_seat -i " << trainID << " -T " << trainStartTime << " -s " << fromStation << " -t " << toStation << " -n " << ticketNum ;
+            std::string logStr ;
+            s >> logStr ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
+            log_write (curLog) ;
+
+            s.clear(); logStr.clear() ;
+            s << "[" << timeStamp << "] " ;
+            s << "delete_order -u " << username << " -p " << order_file_pos ;
+            s >> logStr ;
+            preFilePos = get_last_log_pos() ;
+            curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            log_write (curLog) ;
         } else {
             cur_order.setStatus (pending) ;
             int order_file_pos = order_write (cur_order) ;
             orders.insert (data (username, order_file_pos)) ;
             pendingOrders.insert (data (trainID, order_file_pos)) ;
             printf("queue\n") ;
+
+            std::stringstream s ;
+            std::string logStr ;
+            s << "[" << timeStamp << "] " ;
+            s << "delete_order -u " << username << " -p " << order_file_pos ;
+            s >> logStr ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            log_write (curLog) ;
+
+            s.clear(); logStr.clear() ;
+            s << "[" << timeStamp << "] " ;
+            s << "delete_pending_order -i " << trainID << " -p " << order_file_pos ;
+            s >> logStr ;
+            preFilePos = get_last_log_pos() ;
+            curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            log_write (curLog) ;
         }
 
         train_write (train_file_pos, cur_train) ;
@@ -686,6 +911,15 @@ public:
         String trainID = cur_order.getTrainID() ;
         if (cur_order.getStatus() == pending) {
             pendingOrders.erase (data (trainID, order_file_pos)) ;
+
+            std::stringstream s ;
+            std::string logStr ;
+            s << "[" << timeStamp << "] " ;
+            s << "add_pending_order -i " << trainID << " -p " << order_file_pos ;
+            s >> logStr ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            log_write (curLog) ;
         } else {
             sjtu::vector<int> tmp ;
             trains.find (data (trainID, 0), tmp) ;
@@ -694,6 +928,29 @@ public:
             Time trainStartTime = cur_train.getStartTimeFromLeavingTime (cur_order.getLeavingTime(), cur_order.getFromStation()) ;
             cur_train.addSeats (trainStartTime, cur_order.getFromStation(), cur_order.getToStation(), cur_order.getSeatNum()) ;
 
+            std::stringstream s ;
+            s << "[" << timeStamp << "] " ;
+            s << "sell_train_seat -i " << trainID << " -T " << trainStartTime << " -s " << cur_order.getFromStation() << " -t " << cur_order.getToStation() << " -n " << cur_order.getSeatNum() ;
+            std::string logStr ;
+            s >> logStr ;
+            int preFilePos = get_last_log_pos() ;
+            log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
+            log_write (curLog) ;
+
+            s.clear(); logStr.clear() ;
+            s << "[" << timeStamp << "] " ;
+            s << "change_order_toSuccess -p " << order_file_pos ;
+            s >> logStr ;
+            preFilePos = get_last_log_pos() ;
+            curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
+            log_write (curLog) ;
+
             tmp.clear() ;
             pendingOrders.find (data (trainID, 0), tmp) ;
             for (int i = 0; i < tmp.size(); i ++) {
@@ -701,9 +958,32 @@ public:
                 Time pending_startTime = cur_train.getStartTimeFromLeavingTime (pending_order.getLeavingTime(), pending_order.getFromStation()) ;
                 if (pending_order.getSeatNum() <= cur_train.calSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation())) {
                     cur_train.sellSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation(), pending_order.getSeatNum()) ;
+                    
+                    s.clear(); logStr.clear() ;
+                    s << "[" << timeStamp << "] " ;
+                    s << "add_train_seat -i " << trainID << " -T " << pending_startTime << " -s " << pending_order.getFromStation() << " -t " << pending_order.getToStation() << " -n " << pending_order.getSeatNum() ;
+                    s >> logStr ;
+                    int preFilePos = get_last_log_pos() ;
+                    log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+                    #ifdef debug
+                        curLog.print() ;
+                    #endif
+                    log_write (curLog) ;
+
                     pending_order.setStatus (success) ;
                     order_write (tmp[i], pending_order) ;
                     pendingOrders.erase (data (trainID, tmp[i])) ;
+
+                    s.clear(); logStr.clear() ;
+                    s << "[" << timeStamp << "] " ;
+                    s << "change_order_toPending -i " << trainID << " -p " << tmp[i] ;
+                    s >> logStr ;
+                    preFilePos = get_last_log_pos() ;
+                    curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+                    #ifdef debug
+                        curLog.print() ;
+                    #endif
+                    log_write (curLog) ;
                 }
             }
             train_write (train_file_pos, cur_train) ;
@@ -711,6 +991,30 @@ public:
         cur_order.setStatus (refunded) ;
         order_write (order_file_pos, cur_order) ;
 
+        printf("0\n") ;
+    }
+
+    void rollback () {
+        String username ;
+        int targTimeStamp = 0 ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 't') targTimeStamp = String (argument[i + 1]).toInt() ;
+        }
+        // printf("timeStamp: %d\n", timeStamp) ;
+        // printf("targTimeStamp: %d\n", targTimeStamp) ;
+        if (targTimeStamp > timeStamp) throw "time travel!" ;
+        int curFilePos = get_last_log_pos() ;
+        while (curFilePos != -1) {
+            log curLog; log_read (curLog, curFilePos) ;
+            // printf("curLog: timestamp: %d %s\n", curLog.timeStamp, curLog.str) ;
+            if (curLog.timeStamp <= targTimeStamp) break ;
+            op.clear(); op = std::string (curLog.str) ;
+            // std::cout << op << "\n" ;
+            isRollback = true; run () ;
+            curFilePos = curLog.preFilePos ;
+        }
+        update_last_log_pos (curFilePos) ;
+        curUsers.clear() ;
         printf("0\n") ;
     }
 

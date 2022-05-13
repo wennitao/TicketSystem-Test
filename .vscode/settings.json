@@ -69,7 +69,11 @@
         "complex": "cpp",
         "locale": "cpp",
         "mutex": "cpp",
-        "ratio": "cpp"
+        "ratio": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "variant": "cpp",
+        "__bits": "cpp"
     },
     "python.pythonPath": "/usr/bin/python3"
 }

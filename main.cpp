@@ -14,7 +14,7 @@ BPlusTree trainStations ("trainStations.dat") ;
 BPlusTree orders ("orders_B+Tree.dat") ;
 BPlusTree pendingOrders ("pendingOrders.dat") ;
 
-std::fstream userio, trainio, orderio, seatio ;
+std::fstream userio, trainio, orderio, seatio, logio ;
 
 void init () {
     std::fstream in ("users.dat", std::ios::in | std::ios::binary) ;
@@ -58,18 +58,30 @@ void init () {
     }
     in.close() ;
     if (!seatio.is_open()) seatio.open ("seats.dat", std::ios::in | std::ios::out | std::ios::binary) ;
+
+    in.open ("log.dat", std::ios::in | std::ios::binary) ;
+    if (!in.is_open()) {
+        std::fstream out ("log.dat", std::ios::out | std::ios::binary) ;
+        out.close() ;
+        logio.open ("log.dat", std::ios::in | std::ios::out | std::ios::binary) ;
+        logio.seekp (0, std::ios::end) ;
+        int tmp = -1 ;
+        logio.write (reinterpret_cast<char *>(&tmp), sizeof (tmp)) ;
+    }
+    in.close() ;
+    if (!logio.is_open()) logio.open ("log.dat", std::ios::in | std::ios::out | std::ios::binary) ;
 }
+
+bool isExit ;
 
 int main() {
     //freopen("1.in" , "r" , stdin);
     init () ;
     std::string op ;
     while (getline (std::cin, op)) {
-        if (op == std::string ("exit")) {
-            printf("bye\n"); break ;
-        }
         CommandHandler cmd = CommandHandler (op) ;
         cmd.run () ;
+        if (isExit) break ;
     }
 
     userio.close() ;

@@ -43,6 +43,8 @@ private:
     HashMap stationHashMap ;
 
 public:
+    String startTimeStr, saleDateStr ;
+
     train () {}
     train (const String &_trainID, const int _stationNum, const String *_stations, const int _seatNum, const int *_prices, const Time &_startTime, const int *_travelTimes, const int *_stopoverTimes, const Time *_saleDate, const char _type) {
         trainID = _trainID ;
@@ -84,6 +86,10 @@ public:
         return trainID ;
     }
 
+    char getType () const {
+        return type ;
+    }
+
     void release () {
         if (released) throw "already released" ;
         released = 1 ;
@@ -94,6 +100,10 @@ public:
             int file_pos = seat_write (cur) ;
             seatFilePos[i] = file_pos ;
         }
+    }
+
+    void unrelease () {
+        released = 0 ;
     }
 
     bool isReleased () {
@@ -185,11 +195,23 @@ public:
         return startTime + travelTimesSum[stationID - 1] + stopoverTimesSum[stationID - 1] ;
     }
 
+    int getTravellingTime (int id) const {
+        return travelTimesSum[id] - travelTimesSum[id - 1] ;
+    }
+
+    int getStopoverTime (int id) const {
+        return stopoverTimesSum[id] - stopoverTimesSum[id - 1] ;
+    }
+
     int calTravellingTime (const String &fromStation, const String &toStation) const {
         int from_id = stationHashMap.find (fromStation), to_id = stationHashMap.find (toStation) ;
         // assert (stations[from_id] == fromStation) ;
         // assert (stations[to_id] == toStation) ;
         return travelTimesSum[to_id - 1] + stopoverTimesSum[to_id - 1] - (travelTimesSum[from_id - 1] + stopoverTimesSum[from_id]) ;
+    }
+
+    int getPrice (int id) const {
+        return priceSum[id] - priceSum[id - 1] ;
     }
 
     int calPrice (const String &fromStation, const String &toStation) const {
