@@ -15,3 +15,5 @@ extern std::fstream trainio ;
 extern std::fstream orderio ;
 extern std::fstream seatio ;
 extern std::fstream logio ;
+
+extern bool isExit ;

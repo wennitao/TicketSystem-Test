@@ -25,7 +25,10 @@ public:
     }
 
     void login (const String &_password) const {
-        if (password != _password) throw "wrong password" ;
+        if (password != _password) {
+            // std::cout << _password << " " << password << std::endl ;
+            throw "wrong password" ;
+        }
     }
 
     void modifyPassword (const String &_password) {

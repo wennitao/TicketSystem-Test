@@ -1,0 +1,40 @@
+[7] login -u pks -p pksissb
+[14] add_user -c pkspks -u pks -p vb -n 胎啈闬 -m peLWKYwemlSJGGiu -g 8
+[16] query_profile -c pks -u pks
+[26] query_order -u pks
+[30] login -u pks -p qRlqH
+[35] query_order -u pks
+[40] login -u pks -p vb
+[49] query_profile -c pks -u pks -p CunMoazcZollfFlaJxvXc -g 8
+[51] logout -u pks
+[52] logout -u pks
+[53] query_profile -c pks -u pks
+[55] logout -u pks
+[62] query_order -u pks
+[68] login -u pks -p AMkZhhcEVALOqgLcbWUzYpMim
+[76] query_profile -c pks -u pks
+[77] query_profile -c pks -u pks
+[83] login -u pks -p vb
+[90] query_profile -c pks -u pks -p IKcvLrTvSUxNFoutCvqrTsXcZDjjA -g 9
+[97] login -u pks -p OxaZzwvBayBrntpwRFGdRfCIT
+[106] rollback -t 74
+[109] login -u pks -p vb
+[116] query_profile -c pks -u pks
+[125] query_profile -c pks -u pks -p mKWFUESgAsCnxNZUXicPlEWHFecJ -g 7
+[134] query_profile -c pks -u pks
+[140] query_profile -c pks -u pks
+[148] refund_ticket -u pks -n 3
+[159] refund_ticket -u pks -n 3
+[165] query_profile -c pks -u pks
+[175] logout -u pks
+[181] query_profile -c pks -u pks
+[188] query_order -u pks
+[194] logout -u pks
+[202] query_profile -c pks -u pks -p jvraZJJjvFiIWFllZqcf -g 1
+[206] rollback -t 157
+[210] query_order -u pks
+[217] query_profile -c pks -u pks
+[222] query_profile -c pks -u pks -p NzRwdIGwUHJPe -g 3
+[227] query_profile -c pks -u pks
+[232] logout -u pks
+[240] exit

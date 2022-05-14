@@ -14,7 +14,9 @@ BPlusTree trainStations ("trainStations.dat") ;
 BPlusTree orders ("orders_B+Tree.dat") ;
 BPlusTree pendingOrders ("pendingOrders.dat") ;
 
-std::fstream userio, trainio, orderio, seatio ;
+std::fstream userio, trainio, orderio, seatio, logio ;
+
+bool isExit = false ;
 
 void init () {
     std::fstream in ("users.dat", std::ios::in | std::ios::binary) ;
@@ -65,11 +67,9 @@ int main() {
     init () ;
     std::string op ;
     while (getline (std::cin, op)) {
-        if (op == std::string ("exit")) {
-            printf("bye\n"); break ;
-        }
         CommandHandler cmd = CommandHandler (op) ;
         cmd.run () ;
+        if (isExit) break ;
     }
 
     userio.close() ;

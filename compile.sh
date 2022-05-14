@@ -1,4 +1,5 @@
 rm *.dat
+rm log.txt
 sleep 0.5s
 cmake . && make
 

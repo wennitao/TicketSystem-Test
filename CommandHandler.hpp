@@ -23,22 +23,28 @@ class CommandHandler {
 private:
     std::string op ;
     char argument[30][10010] ;
-    int key_cnt = 1, timeStamp ;
+    int key_cnt = 1, timeStamp = 0 ;
+    bool isRollback = 0 ;
 
 public:
     CommandHandler (const std::string _op) {
         // std::cout << _op << std::endl ;
         op = _op ;
+
+        std::ofstream logOut("log.txt", std::ios::out | std::ios::app) ;
+        logOut << op << std::endl ;
+        logOut.close() ;
     }
 
     void analyze () {
-        bool isTimeStamp = 0 ;
+        key_cnt = 1; timeStamp = 0 ;
+        bool isTimeStamp = 1 ;
         int cur_len = 0 ;
         for (int i = 0; i < op.length(); i ++) {
             if (op[i] == ' ') {
                 if (isTimeStamp) {
                     timeStamp = 0 ;
-                    for (int i = 0; i < cur_len; i ++)
+                    for (int i = 1; i < cur_len - 1; i ++)
                         timeStamp = timeStamp * 10 + argument[key_cnt][i] - '0' ;
                     cur_len = 0; isTimeStamp = 0 ;
                 } else {
@@ -141,10 +147,11 @@ public:
 
     void run () {
         try {
-            analyze () ;
+            if (!isRollback) analyze () ;
             // printf("%d ", timeStamp) ;
             // for (int i = 1; i <= key_cnt; i ++) printf("%s ", argument[i]) ;
             // printf("\n") ;
+            if (!isRollback) printf("[%d] ", timeStamp) ;
             if (strcmp (argument[1], "add_user") == 0) {
                 add_user () ;
             } else if (strcmp (argument[1], "login") == 0) {
@@ -173,11 +180,17 @@ public:
                 query_order () ;
             } else if (strcmp (argument[1], "refund_ticket") == 0) {
                 refund_ticket () ;
+            } else if (strcmp (argument[1], "rollback") == 0) {
+                rollback() ;
             } else if (strcmp (argument[1], "clean") == 0) {
                 clean() ;
+            } else if (strcmp (argument[1], "exit") == 0) {
+                printf("bye\n") ;
+                isExit = true ;
             }
-        } catch (...) {
-            printf("-1\n") ;
+        } catch (const char* s) {
+            if (!isRollback) printf("-1\n") ;
+            // printf("exception: %s\n", s) ;
         }
     }
 
@@ -210,7 +223,7 @@ public:
         user new_user = user (username, password, name, mailAddr, privilege) ;
         int write_pos = user_write (new_user) ;
         users.insert (data (username, write_pos)) ;
-        printf ("0\n") ;
+        if (!isRollback) printf ("0\n") ;
     }
 
     void login () {
@@ -230,7 +243,7 @@ public:
         user cur_user; user_read (cur_user, user_file_pos) ;
         cur_user.login (password) ;
         curUsers.insert (data (username, user_file_pos)) ;
-        printf ("0\n") ;
+        if (!isRollback) printf ("0\n") ;
     }
 
     void logout () {
@@ -243,10 +256,11 @@ public:
         if (pos.empty()) throw "cur user not logged in" ;
         int user_file_pos = pos[0] ;
         curUsers.erase (data (username, user_file_pos)) ;
-        printf ("0\n") ;
+        if (!isRollback) printf ("0\n") ;
     }
 
     void query_profile () {
+        if (isRollback) return ;
         String cur_username, username ;
         for (int i = 2; i <= key_cnt; i += 2) {
             if (argument[i][1] == 'c') cur_username = argument[i + 1] ;
@@ -302,7 +316,7 @@ public:
         if (privilege != -1) modify_user.modifyPrivilege (privilege) ;
         user_write (modify_user_file_pos, modify_user) ;
 
-        std::cout << modify_user << std::endl ;
+        if (!isRollback) std::cout << modify_user << std::endl ;
     }
 
     void split_String (String *res, char *str) {
@@ -366,7 +380,7 @@ public:
             trainStations.insert (data (stations[i], train_file_pos)) ;
         }
 
-        printf("0\n") ;
+        if (!isRollback) printf("0\n") ;
     }
 
     void release_train () {
@@ -383,10 +397,11 @@ public:
         cur_train.release() ;
         train_write (train_file_pos, cur_train) ;
 
-        printf("0\n") ;
+        if (!isRollback) printf("0\n") ;
     }
 
     void query_train () {
+        if (isRollback) return ;
         String trainID ;
         Time date ;
         for (int i = 2; i <= key_cnt; i += 2) {
@@ -421,7 +436,7 @@ public:
         }
         trains.erase (data (trainID, train_file_pos)) ;
         train_delete (train_file_pos) ;
-        printf("0\n") ; 
+        if (!isRollback) printf("0\n") ; 
     }
 
     // class cmp_time {
@@ -453,6 +468,7 @@ public:
     }
 
     void query_ticket () {
+        if (isRollback) return ;
         String fromStation, toStation ;
         Time date ;
         int priority = 0 ;
@@ -513,6 +529,7 @@ public:
     }
 
     void query_transfer () {
+        if (isRollback) return ;
         String fromStation, toStation ;
         Time date ;
         bool priority = 0 ;
@@ -627,19 +644,20 @@ public:
             cur_train.sellSeats (trainStartTime, fromStation, toStation, ticketNum) ;
             int order_file_pos = order_write (cur_order) ;
             orders.insert (data (username, order_file_pos)) ;
-            printf("%lld\n", 1ll * ticketNum * cur_train.calPrice (fromStation, toStation)) ;
+            if (!isRollback) printf("%lld\n", 1ll * ticketNum * cur_train.calPrice (fromStation, toStation)) ;
         } else {
             cur_order.setStatus (pending) ;
             int order_file_pos = order_write (cur_order) ;
             orders.insert (data (username, order_file_pos)) ;
             pendingOrders.insert (data (trainID, order_file_pos)) ;
-            printf("queue\n") ;
+            if (!isRollback) printf("queue\n") ;
         }
 
         train_write (train_file_pos, cur_train) ;
     }
 
     void query_order () {
+        if (isRollback) return ;
         String username ;
         for (int i = 2; i <= key_cnt; i += 2) {
             if (argument[i][1] == 'u') username = argument[i + 1] ;
@@ -711,7 +729,30 @@ public:
         cur_order.setStatus (refunded) ;
         order_write (order_file_pos, cur_order) ;
 
-        printf("0\n") ;
+        if (!isRollback) printf("0\n") ;
+    }
+
+    void rollback () {
+        // if (isRollback) return ;
+        int targTimeStamp = String (argument[3]).toInt() ;
+        // printf("targTimeStamp: %d\n", targTimeStamp) ;
+        bool preIsRollback = isRollback ;
+        isRollback = true ;
+        clean () ;
+        ifstream logIn ("log.txt", std::ios::in) ;
+        std::string curOp ;
+        while (getline (logIn, curOp)) {
+            // std::cout << curOp << std::endl ;
+            op = std::string (curOp) ;
+            analyze () ;
+            // printf("time: %d %s\n", timeStamp, op.c_str()) ;
+            if (timeStamp <= targTimeStamp) run () ;
+            else break ;
+        }
+        curUsers.clear() ;
+        isRollback = preIsRollback ;
+        if (!isRollback) printf("0\n") ;
+        logIn.close() ;
     }
 
     void clean () {
@@ -722,7 +763,7 @@ public:
         orders.clear() ;
         pendingOrders.clear() ;
 
-        printf("0\n") ;
+        if (!isRollback) printf("0\n") ;
     }
 } ;
 
