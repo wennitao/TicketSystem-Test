@@ -2,15 +2,31 @@ import os
 
 testcase_num = 11
 
-os.system("./compile.sh")
+folderName = input ()
+testcase_num = int(input ())
 
-for i in range(testcase_num):
-    print("processing", i, "...")
+def runForce():
     os.system("rm *.dat")
-    os.system("./code < bin/" + str(i) + ".in > test/" + str(i) + ".out")
+    os.system("rm log.txt")
 
-for i in range(testcase_num):
-    print("evaluate", i, "...")
-    ret = os.system("diff test/{}.out bin/naive_{}.out".format(i, i))
-    if ret != 0:
-        print("error in", i, "!")
+    for i in range(1, testcase_num + 1):
+        print("processing", i, "...")
+        os.system("./code < total_rollback/" + folderName + "/" + str(i) + ".in > force/" + str(i) + ".out")
+
+def runRollback():
+    os.system("./compile.sh")
+    os.system("rm *.dat")
+    os.system("rm log.txt")
+    for i in range(1, testcase_num + 1):
+        print("processing", i, "...")
+        os.system("./rollback < total_rollback/" + folderName + "/" + str(i) + ".in > test/" + str(i) + ".out")
+
+def runEvaluate():
+    for i in range(1, testcase_num + 1):
+        print("evaluate", i, "...")
+        ret = os.system("diff force/{}.out test/{}.out".format(i, i))
+        if ret != 0:
+            print("error in", i, "!")
+
+runRollback()
+runEvaluate()

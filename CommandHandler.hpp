@@ -1,7 +1,7 @@
 #ifndef TicketSystem_CommandHandler
 #define TicketSystem_CommandHandler
 
-#define debug
+// #define debug
 
 #include <iostream>
 #include <fstream>
@@ -841,10 +841,11 @@ public:
             s << "[" << timeStamp << "] " ;
             s << "add_train_seat -i " << trainID << " -T " << trainStartTime << " -s " << fromStation << " -t " << toStation << " -n " << ticketNum ;
             std::string logStr ;
-            s >> logStr ;
+            getline (s, logStr) ;
             int preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
+            //    std::cout << logStr << std::endl ;
                curLog.print() ;
             #endif
             log_write (curLog) ;
@@ -852,7 +853,7 @@ public:
             s.clear(); logStr.clear() ;
             s << "[" << timeStamp << "] " ;
             s << "delete_order -u " << username << " -p " << order_file_pos ;
-            s >> logStr ;
+            getline (s, logStr) ;
             preFilePos = get_last_log_pos() ;
             curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             log_write (curLog) ;
@@ -867,7 +868,7 @@ public:
             std::string logStr ;
             s << "[" << timeStamp << "] " ;
             s << "delete_order -u " << username << " -p " << order_file_pos ;
-            s >> logStr ;
+            getline (s, logStr) ;
             int preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             log_write (curLog) ;
@@ -875,7 +876,7 @@ public:
             s.clear(); logStr.clear() ;
             s << "[" << timeStamp << "] " ;
             s << "delete_pending_order -i " << trainID << " -p " << order_file_pos ;
-            s >> logStr ;
+            getline (s, logStr) ;
             preFilePos = get_last_log_pos() ;
             curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             log_write (curLog) ;
@@ -936,7 +937,7 @@ public:
             std::string logStr ;
             s << "[" << timeStamp << "] " ;
             s << "add_pending_order -i " << trainID << " -p " << order_file_pos ;
-            s >> logStr ;
+            getline (s, logStr) ;
             int preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             log_write (curLog) ;
@@ -952,7 +953,7 @@ public:
             s << "[" << timeStamp << "] " ;
             s << "sell_train_seat -i " << trainID << " -T " << trainStartTime << " -s " << cur_order.getFromStation() << " -t " << cur_order.getToStation() << " -n " << cur_order.getSeatNum() ;
             std::string logStr ;
-            s >> logStr ;
+            getline (s, logStr) ;
             int preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
@@ -963,7 +964,7 @@ public:
             s.clear(); logStr.clear() ;
             s << "[" << timeStamp << "] " ;
             s << "change_order_toSuccess -p " << order_file_pos ;
-            s >> logStr ;
+            getline (s, logStr) ;
             preFilePos = get_last_log_pos() ;
             curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
@@ -982,7 +983,7 @@ public:
                     s.clear(); logStr.clear() ;
                     s << "[" << timeStamp << "] " ;
                     s << "add_train_seat -i " << trainID << " -T " << pending_startTime << " -s " << pending_order.getFromStation() << " -t " << pending_order.getToStation() << " -n " << pending_order.getSeatNum() ;
-                    s >> logStr ;
+                    getline (s, logStr) ;
                     int preFilePos = get_last_log_pos() ;
                     log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
                     #ifdef debug
@@ -997,7 +998,7 @@ public:
                     s.clear(); logStr.clear() ;
                     s << "[" << timeStamp << "] " ;
                     s << "change_order_toPending -i " << trainID << " -p " << tmp[i] ;
-                    s >> logStr ;
+                    getline (s, logStr) ;
                     preFilePos = get_last_log_pos() ;
                     curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
                     #ifdef debug
