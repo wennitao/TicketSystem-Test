@@ -184,7 +184,7 @@ public:
                 rollback() ;
             } else if (strcmp (argument[1], "clean") == 0) {
                 clean() ;
-            } else if (strcmp (argument[1], "exit") == 0) {
+            } else if (!isRollback && strcmp (argument[1], "exit") == 0) {
                 printf("bye\n") ;
                 isExit = true ;
             }
