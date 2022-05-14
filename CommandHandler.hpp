@@ -1,7 +1,7 @@
 #ifndef TicketSystem_CommandHandler
 #define TicketSystem_CommandHandler
 
-#define debug
+// #define debug
 
 #include <iostream>
 #include <fstream>
@@ -176,6 +176,7 @@ public:
             // printf("%d ", timeStamp) ;
             // for (int i = 1; i <= key_cnt; i ++) printf("%s ", argument[i]) ;
             // printf("\n") ;
+            if (!isRollback) printf("[%d] ", timeStamp) ;
             if (strcmp (argument[1], "add_user") == 0) {
                 add_user () ;
             } else if (strcmp (argument[1], "delete_user") == 0) {
@@ -208,15 +209,30 @@ public:
                 query_order () ;
             } else if (strcmp (argument[1], "refund_ticket") == 0) {
                 refund_ticket () ;
+            } else if (strcmp (argument[1], "add_train_seat") == 0) {
+                add_train_seat() ;
+            } else if (strcmp (argument[1], "delete_order") == 0) {
+                delete_order() ;
+            } else if (strcmp (argument[1], "delete_pending_order") == 0) {
+                delete_pending_order() ;
+            } else if (strcmp (argument[1], "add_pending_order") == 0) {
+                add_pending_order () ;
+            } else if (strcmp (argument[1], "sell_train_seat" == 0)) {
+                sell_train_seat () ;
+            } else if (strcmp (argument[1], "change_order_toSuccess") == 0) {
+                change_order_toSuccess () ;
+            } else if (strcmp (argument[1], "change_order_toPending") == 0) {
+                change_order_toPending () ;
             } else if (strcmp (argument[1], "rollback") == 0) {
                 rollback () ;
             } else if (strcmp (argument[1], "clean") == 0) {
                 clean() ;
             } else if (strcmp (argument[1], "exit") == 0) {
+                printf("bye\n") ;
                 isExit = 1 ;
             }
         } catch (...) {
-            printf("-1\n") ;
+            if (!isRollback) printf("-1\n") ;
         }
     }
 
@@ -337,6 +353,7 @@ public:
     }
 
     void query_profile () {
+        if (isRollback) return ;
         String cur_username, username ;
         for (int i = 2; i <= key_cnt; i += 2) {
             if (argument[i][1] == 'c') cur_username = argument[i + 1] ;
@@ -408,7 +425,7 @@ public:
         if (privilege != -1) modify_user.modifyPrivilege (privilege) ;
         user_write (modify_user_file_pos, modify_user) ;
 
-        std::cout << modify_user << std::endl ;
+        if (!isRollback) std::cout << modify_user << std::endl ;
     }
 
     String int_to_str (int x) {
@@ -545,6 +562,7 @@ public:
     }
 
     void query_train () {
+        if (isRollback) return ;
         String trainID ;
         Time date ;
         for (int i = 2; i <= key_cnt; i += 2) {
@@ -641,6 +659,7 @@ public:
     }
 
     void query_ticket () {
+        if (isRollback) return ;
         String fromStation, toStation ;
         Time date ;
         int priority = 0 ;
@@ -701,6 +720,7 @@ public:
     }
 
     void query_transfer () {
+        if (isRollback) return ;
         String fromStation, toStation ;
         Time date ;
         bool priority = 0 ;
@@ -994,6 +1014,94 @@ public:
         printf("0\n") ;
     }
 
+    void add_train_seat() {
+        String trainID, fromStation, toStation ;
+        Time trainStartTime ;
+        int num = 0 ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'i') trainID = argument[i + 1] ;
+            else if (argument[i][1] == 'T') {
+                String tmp = argument[i + 1] ;
+                trainStartTime = Time (tmp.substr (0, 4), 0) ;
+            } 
+            else if (argument[i][1] == 's') fromStation = argument[i + 1] ;
+            else if (argument[i][1] == 't') toStation = argument[i + 1] ;
+            else if (argument[i][1]) num = String (argument[i + 1]).toInt() ;
+        }
+        vector<int> pos ;
+        trains.find (data (trainID, 0), pos) ;
+        train curTrain; train_read (curTrain, pos[0]) ;
+        curTrain.addSeats (trainStartTime, fromStation, toStation, num) ;
+    }
+
+    void delete_order () {
+        String username ;
+        int filePos = 0 ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'p') filePos = String (argument[i + 1]).toInt() ;
+        }
+        orders.erase (data (username, filePos)) ;
+    }
+
+    void delete_pending_order () {
+        String trainID ;
+        int filePos ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'p') filePos = String (argument[i + 1]).toInt() ;
+        }
+        pendingOrders.erase (data (trainID, filePos)) ;
+    }
+
+    void add_pending_order () {
+        String trainID ;
+        int filePos ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
+            else if (argument[i][1] == 'p') filePos = String (argument[i + 1]).toInt() ;
+        }
+        pendingOrders.insert (data (trainID, filePos)) ;
+    }
+
+    void sell_train_seat() {
+        String trainID, fromStation, toStation ;
+        Time trainStartTime ;
+        int num = 0 ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'i') trainID = argument[i + 1] ;
+            else if (argument[i][1] == 'T') {
+                String tmp = argument[i + 1] ;
+                trainStartTime = Time (tmp.substr (0, 4), 0) ;
+            } 
+            else if (argument[i][1] == 's') fromStation = argument[i + 1] ;
+            else if (argument[i][1] == 't') toStation = argument[i + 1] ;
+            else if (argument[i][1]) num = String (argument[i + 1]).toInt() ;
+        }
+        vector<int> pos ;
+        trains.find (data (trainID, 0), pos) ;
+        train curTrain; train_read (curTrain, pos[0]) ;
+        curTrain.sellSeats (trainStartTime, fromStation, toStation, num) ;
+    }
+
+    void change_order_toSuccess() {
+        int filePos = 0 ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'p') filePos = String (argument[i + 1]).toInt() ;
+        }
+        order curOrder; order_read (curOrder, filePos) ;
+        curOrder.setStatus (success) ;
+    }
+
+    void change_order_toPending() {
+        int filePos = 0 ;
+        for (int i = 2; i <= key_cnt; i += 2) {
+            if (argument[i][1] == 'p') filePos = String (argument[i + 1]).toInt() ;
+        }
+        order curOrder; order_read (curOrder, filePos) ;
+        curOrder.setStatus (pending) ;
+    }
+
     void rollback () {
         String username ;
         int targTimeStamp = 0 ;
@@ -1015,6 +1123,7 @@ public:
         }
         update_last_log_pos (curFilePos) ;
         curUsers.clear() ;
+        isRollback = false ;
         printf("0\n") ;
     }
 
