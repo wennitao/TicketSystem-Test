@@ -217,7 +217,7 @@ public:
                 delete_pending_order() ;
             } else if (strcmp (argument[1], "add_pending_order") == 0) {
                 add_pending_order () ;
-            } else if (strcmp (argument[1], "sell_train_seat" == 0)) {
+            } else if (strcmp (argument[1], "sell_train_seat") == 0) {
                 sell_train_seat () ;
             } else if (strcmp (argument[1], "change_order_toSuccess") == 0) {
                 change_order_toSuccess () ;
@@ -1028,7 +1028,7 @@ public:
             else if (argument[i][1] == 't') toStation = argument[i + 1] ;
             else if (argument[i][1]) num = String (argument[i + 1]).toInt() ;
         }
-        vector<int> pos ;
+        sjtu::vector<int> pos ;
         trains.find (data (trainID, 0), pos) ;
         train curTrain; train_read (curTrain, pos[0]) ;
         curTrain.addSeats (trainStartTime, fromStation, toStation, num) ;
@@ -1078,7 +1078,7 @@ public:
             else if (argument[i][1] == 't') toStation = argument[i + 1] ;
             else if (argument[i][1]) num = String (argument[i + 1]).toInt() ;
         }
-        vector<int> pos ;
+        sjtu::vector<int> pos ;
         trains.find (data (trainID, 0), pos) ;
         train curTrain; train_read (curTrain, pos[0]) ;
         curTrain.sellSeats (trainStartTime, fromStation, toStation, num) ;

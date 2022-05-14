@@ -7,7 +7,6 @@ os.system("./compile.sh")
 for i in range(testcase_num):
     print("processing", i, "...")
     os.system("rm *.dat")
-    os.system("rm log.txt")
     os.system("./code < bin/" + str(i) + ".in > test/" + str(i) + ".out")
 
 for i in range(testcase_num):
