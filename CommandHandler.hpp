@@ -492,6 +492,7 @@ public:
             else if (argument[i][1] == 'y') type = argument[i + 1][0] ;
         }
 
+
         sjtu::vector<int> pos ;
         trains.find (data (trainID, 0), pos) ;
         if (!pos.empty()) throw "train already exists" ;
@@ -682,6 +683,7 @@ public:
         // std::sort (train2.begin(), train2.end()) ;
         // train1.sort1 () ;
         // train2.sort1 () ;
+
         sjtu::vector<int> possible_trains ;
         int train1_id = 0, train2_id = 0 ;
         while (train1_id < train1.size() && train2_id < train2.size()) {
@@ -842,7 +844,7 @@ public:
 
             std::stringstream s ;
             s << "[" << timeStamp << "] " ;
-            s << "add_train_seat -i " << trainID << " -T " << trainStartTime << " -s " << fromStation << " -t " << toStation << " -n " << ticketNum ;
+            s << "add_train_seat -i " << trainID << " -T " << trainStartTime.getDateStr() << " -s " << fromStation << " -t " << toStation << " -n " << ticketNum ;
             std::string logStr ;
             getline (s, logStr) ;
             int preFilePos = get_last_log_pos() ;
@@ -957,7 +959,7 @@ public:
 
             std::stringstream s ;
             s << "[" << timeStamp << "] " ;
-            s << "sell_train_seat -i " << trainID << " -T " << trainStartTime << " -s " << cur_order.getFromStation() << " -t " << cur_order.getToStation() << " -n " << cur_order.getSeatNum() ;
+            s << "sell_train_seat -i " << trainID << " -T " << trainStartTime.getDateStr() << " -s " << cur_order.getFromStation() << " -t " << cur_order.getToStation() << " -n " << cur_order.getSeatNum() ;
             std::string logStr ;
             getline (s, logStr) ;
             int preFilePos = get_last_log_pos() ;
@@ -988,7 +990,7 @@ public:
                     
                     s.clear(); logStr.clear() ;
                     s << "[" << timeStamp << "] " ;
-                    s << "add_train_seat -i " << trainID << " -T " << pending_startTime << " -s " << pending_order.getFromStation() << " -t " << pending_order.getToStation() << " -n " << pending_order.getSeatNum() ;
+                    s << "add_train_seat -i " << trainID << " -T " << pending_startTime.getDateStr() << " -s " << pending_order.getFromStation() << " -t " << pending_order.getToStation() << " -n " << pending_order.getSeatNum() ;
                     getline (s, logStr) ;
                     int preFilePos = get_last_log_pos() ;
                     log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
@@ -1073,6 +1075,7 @@ public:
     }
 
     void sell_train_seat() {
+        // printf("sell_train_seat\n") ;
         String trainID, fromStation, toStation ;
         Time trainStartTime ;
         int num = 0 ;
@@ -1100,6 +1103,7 @@ public:
         }
         order curOrder; order_read (curOrder, filePos) ;
         curOrder.setStatus (success) ;
+        order_write (filePos, curOrder) ;
     }
 
     void change_order_toPending() {
@@ -1109,6 +1113,7 @@ public:
         }
         order curOrder; order_read (curOrder, filePos) ;
         curOrder.setStatus (pending) ;
+        order_write (filePos, curOrder) ;
     }
 
     void rollback () {
@@ -1117,6 +1122,14 @@ public:
         for (int i = 2; i <= key_cnt; i += 2) {
             if (argument[i][1] == 't') targTimeStamp = String (argument[i + 1]).toInt() ;
         }
+
+        // debug
+        // sjtu::vector<int> pos ;
+        // String tmp = String ("LeavesofGrass") ;
+        // trains.find (data (tmp, 0), pos) ;
+        // train debugTrain; train_read (debugTrain, pos[0]) ;
+        // debugTrain.print (Time (String ("08-12"), 0)) ;
+
         // printf("timeStamp: %d\n", timeStamp) ;
         // printf("targTimeStamp: %d\n", targTimeStamp) ;
         if (targTimeStamp > timeStamp) throw "time travel!" ;
@@ -1133,6 +1146,12 @@ public:
         update_last_log_pos (curFilePos) ;
         curUsers.clear() ;
         isRollback = false ;
+
+        // pos.clear() ;
+        // trains.find (data (tmp, 0), pos) ;
+        // train_read (debugTrain, pos[0]) ;
+        // debugTrain.print (Time (String ("08-12"), 0)) ;
+
         printf("0\n") ;
     }
 
