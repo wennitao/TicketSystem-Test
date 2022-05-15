@@ -28,4 +28,5 @@ def runEvaluate():
         if ret != 0:
             print("error in", i, "!")
 
-runRollback()
+runForce()
+# runRollback()

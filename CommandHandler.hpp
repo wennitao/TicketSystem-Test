@@ -653,6 +653,8 @@ public:
             if (!isRollback) printf("queue\n") ;
         }
 
+        if (!isRollback) cur_train.print (date) ;
+
         train_write (train_file_pos, cur_train) ;
     }
 
