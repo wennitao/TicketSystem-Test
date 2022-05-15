@@ -88,6 +88,7 @@ int main() {
     trainio.close() ;
     orderio.close() ;
     seatio.close() ;
+    logio.close() ;
     curUsers.clear() ;
     return 0 ;
 }

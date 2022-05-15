@@ -10,7 +10,7 @@ def runForce():
     os.system("rm log.txt")
 
     for i in range(1, testcase_num + 1):
-        print("processing", i, "...")
+        print("brute-force", i, "...")
         os.system("./code < total_rollback/" + folderName + "/" + str(i) + ".in > force/" + str(i) + ".out")
 
 def runRollback():
@@ -18,7 +18,7 @@ def runRollback():
     os.system("rm *.dat")
     os.system("rm log.txt")
     for i in range(1, testcase_num + 1):
-        print("processing", i, "...")
+        print("rollback", i, "...")
         os.system("./rollback < total_rollback/" + folderName + "/" + str(i) + ".in > test/" + str(i) + ".out")
 
 def runEvaluate():
@@ -28,5 +28,6 @@ def runEvaluate():
         if ret != 0:
             print("error in", i, "!")
 
+runForce()
 runRollback()
 runEvaluate()

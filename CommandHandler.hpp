@@ -231,8 +231,11 @@ public:
                 printf("bye\n") ;
                 isExit = 1 ;
             }
-        } catch (...) {
+        } catch (const char* s) {
             if (!isRollback) printf("-1\n") ;
+            #ifdef debug
+                printf("exception: %s\n", s) ;
+            #endif
         }
     }
 
@@ -882,10 +885,13 @@ public:
             log_write (curLog) ;
         }
 
+        if (trainID == String ("LeavesofGrass")) cur_train.print(date) ;
+
         train_write (train_file_pos, cur_train) ;
     }
 
     void query_order () {
+        if (isRollback) return ;
         String username ;
         for (int i = 2; i <= key_cnt; i += 2) {
             if (argument[i][1] == 'u') username = argument[i + 1] ;
@@ -1033,6 +1039,7 @@ public:
         trains.find (data (trainID, 0), pos) ;
         train curTrain; train_read (curTrain, pos[0]) ;
         curTrain.addSeats (trainStartTime, fromStation, toStation, num) ;
+        train_write (pos[0], curTrain) ;
     }
 
     void delete_order () {
@@ -1083,6 +1090,7 @@ public:
         trains.find (data (trainID, 0), pos) ;
         train curTrain; train_read (curTrain, pos[0]) ;
         curTrain.sellSeats (trainStartTime, fromStation, toStation, num) ;
+        train_write (pos[0], curTrain) ;
     }
 
     void change_order_toSuccess() {

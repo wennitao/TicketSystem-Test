@@ -5,7 +5,7 @@
 
 class log {
 public:
-    char str[1010] ;
+    char str[10010] ;
     int timeStamp, preFilePos ;
 
     log () {}

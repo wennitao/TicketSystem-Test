@@ -127,6 +127,7 @@ public:
     }
 
     bool runningOnDate (const Time &date) const {
+        // std::cout << saleDate[1] << " " << saleDate[2] << std::endl ;
         return saleDate[1] <= date && date <= saleDate[2] ;
     }
 
