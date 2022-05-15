@@ -318,8 +318,7 @@ public:
 
             std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ; 
             logStr += "logout -u " ;
-            for (int i = 0; i < username.len; i ++)
-                logStr = logStr + username.str[i] ;
+            logStr = logStr + username.str ;
             int preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
@@ -339,13 +338,17 @@ public:
         if (pos.empty()) throw "cur user not logged in" ;
         int user_file_pos = pos[0] ;
         curUsers.erase (data (username, user_file_pos)) ;
+
+        pos.clear() ;
+        users.find (data (username, 0), pos) ;
+        user curUser; user_read (curUser, pos[0]) ;
         if (!isRollback) {
             printf ("0\n") ;
 
             std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
             logStr += "login -u " ;
-            for (int i = 0; i < username.len; i ++)
-                logStr = logStr + username.str[i] ;
+            logStr = logStr + username.str ;
+            logStr = logStr + " -p " + curUser.getPassword().str ;
             int preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
@@ -408,12 +411,13 @@ public:
 
         if (!isRollback) {
             std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
-            logStr += "modify_profile -u " ;
+            logStr += "modify_profile -c " ;
             logStr = logStr + username.str ;
-            if (!password.empty()) logStr = logStr + " -p " + cur_user.getPassword().str ;
-            if (!name.empty()) logStr = logStr + " -n " + cur_user.getName().str ;
-            if (!mailAddr.empty()) logStr = logStr + " -m " + cur_user.getMailAddress().str ;
-            if (privilege != -1) logStr = logStr + " -g " + int_to_str (cur_user.getPrivilege()).str ;
+            logStr = logStr + " -u " + username.str ;
+            if (!password.empty()) logStr = logStr + " -p " + modify_user.getPassword().str ;
+            if (!name.empty()) logStr = logStr + " -n " + modify_user.getName().str ;
+            if (!mailAddr.empty()) logStr = logStr + " -m " + modify_user.getMailAddress().str ;
+            if (privilege != -1) logStr = logStr + " -g " + int_to_str (modify_user.getPrivilege()).str ;
             int preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
@@ -850,7 +854,6 @@ public:
             int preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
-            //    std::cout << logStr << std::endl ;
                curLog.print() ;
             #endif
             log_write (curLog) ;
@@ -861,6 +864,9 @@ public:
             getline (s, logStr) ;
             preFilePos = get_last_log_pos() ;
             curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
             log_write (curLog) ;
         } else {
             cur_order.setStatus (pending) ;
@@ -876,6 +882,9 @@ public:
             getline (s, logStr) ;
             int preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
             log_write (curLog) ;
 
             s.clear(); logStr.clear() ;
@@ -884,10 +893,13 @@ public:
             getline (s, logStr) ;
             preFilePos = get_last_log_pos() ;
             curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
             log_write (curLog) ;
         }
 
-        if (trainID == String ("LeavesofGrass")) cur_train.print(date) ;
+        // if (trainID == String ("LeavesofGrass")) cur_train.print(date) ;
 
         train_write (train_file_pos, cur_train) ;
     }
@@ -948,6 +960,20 @@ public:
             getline (s, logStr) ;
             int preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
+            log_write (curLog) ;
+
+            s.clear(); logStr.clear() ;
+            s << "[" << timeStamp << "] " ;
+            s << "change_order_toPending -p " << order_file_pos ;
+            getline (s, logStr) ;
+            preFilePos = get_last_log_pos() ;
+            curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+            #ifdef debug
+               curLog.print() ;
+            #endif
             log_write (curLog) ;
         } else {
             sjtu::vector<int> tmp ;
@@ -1013,6 +1039,17 @@ public:
                         curLog.print() ;
                     #endif
                     log_write (curLog) ;
+
+                    s.clear(); logStr.clear() ;
+                    s << "[" << timeStamp << "] " ;
+                    s << "add_pending_order -i " << trainID << " -p " << tmp[i] ;
+                    getline (s, logStr) ;
+                    preFilePos = get_last_log_pos() ;
+                    curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
+                    #ifdef debug
+                        curLog.print() ;
+                    #endif
+                    log_write (curLog) ;
                 }
             }
             train_write (train_file_pos, cur_train) ;
@@ -1029,10 +1066,7 @@ public:
         int num = 0 ;
         for (int i = 2; i <= key_cnt; i += 2) {
             if (argument[i][1] == 'i') trainID = argument[i + 1] ;
-            else if (argument[i][1] == 'T') {
-                String tmp = argument[i + 1] ;
-                trainStartTime = Time (tmp.substr (0, 4), 0) ;
-            } 
+            else if (argument[i][1] == 'T') trainStartTime = Time (argument[i + 1], 0) ;
             else if (argument[i][1] == 's') fromStation = argument[i + 1] ;
             else if (argument[i][1] == 't') toStation = argument[i + 1] ;
             else if (argument[i][1]) num = String (argument[i + 1]).toInt() ;
