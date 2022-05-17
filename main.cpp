@@ -65,7 +65,7 @@ void init () {
         out.close() ;
         logio.open ("log.dat", std::ios::in | std::ios::out | std::ios::binary) ;
         logio.seekp (0, std::ios::end) ;
-        int tmp = -1 ;
+        long long tmp = -1 ;
         logio.write (reinterpret_cast<char *>(&tmp), sizeof (tmp)) ;
     }
     in.close() ;

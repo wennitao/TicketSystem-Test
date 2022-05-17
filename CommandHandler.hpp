@@ -145,18 +145,18 @@ public:
         orderio.write (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
     }
 
-    void log_read (log &cur, int pos) {
+    void log_read (log &cur, long long pos) {
         logio.seekg (pos, std::ios::beg) ;
         logio.read (reinterpret_cast<char *>(&cur), sizeof (cur)) ;
     }
 
-    void update_last_log_pos (int pos) {
+    void update_last_log_pos (long long pos) {
         logio.seekp (0, std::ios::beg) ;
         logio.write (reinterpret_cast<char *>(&pos), sizeof pos) ;
     }
 
-    int get_last_log_pos () {
-        int pos ;
+    long long get_last_log_pos () {
+        long long pos ;
         logio.seekg (0, std::ios::beg) ;
         logio.read (reinterpret_cast<char *>(&pos), sizeof pos) ;
         return pos ;
@@ -164,7 +164,7 @@ public:
 
     void log_write (log &cur) {
         logio.seekp (0, std::ios::end) ;
-        int curPos = logio.tellp() ;
+        long long curPos = logio.tellp() ;
         logio.write (reinterpret_cast<char *>(&cur), sizeof cur) ;
         logio.seekp (0, std::ios::beg) ;
         logio.write (reinterpret_cast<char *>(&curPos), sizeof curPos) ;
@@ -276,7 +276,7 @@ public:
             logStr += "delete_user -u " ;
             for (int i = 0; i < username.len; i ++)
                 logStr = logStr + username.str[i] ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                 curLog.print() ;
@@ -319,7 +319,7 @@ public:
             std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ; 
             logStr += "logout -u " ;
             logStr = logStr + username.str ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                curLog.print() ;
@@ -349,7 +349,7 @@ public:
             logStr += "login -u " ;
             logStr = logStr + username.str ;
             logStr = logStr + " -p " + curUser.getPassword().str ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                curLog.print() ;
@@ -418,7 +418,7 @@ public:
             if (!name.empty()) logStr = logStr + " -n " + modify_user.getName().str ;
             if (!mailAddr.empty()) logStr = logStr + " -m " + modify_user.getMailAddress().str ;
             if (privilege != -1) logStr = logStr + " -g " + int_to_str (modify_user.getPrivilege()).str ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                curLog.print() ;
@@ -516,7 +516,7 @@ public:
             std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
             logStr += "delete_train -i " ;
             logStr = logStr + trainID.str ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                curLog.print() ;
@@ -545,7 +545,7 @@ public:
             std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
             logStr += "unrelease_train -i " ;
             logStr = logStr + trainID.str ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                curLog.print() ;
@@ -629,7 +629,7 @@ public:
                 logStr = logStr + int_to_str (cur_train.getStopoverTime(i)).str + (i == cur_train.getStationNum() - 1 ? "" : "|") ;
             logStr = logStr + " -d " + cur_train.saleDateStr.str ;
             logStr = logStr + " -y " + cur_train.getType() ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                curLog.print() ;
@@ -851,7 +851,7 @@ public:
             s << "add_train_seat -i " << trainID << " -T " << trainStartTime.getDateStr() << " -s " << fromStation << " -t " << toStation << " -n " << ticketNum ;
             std::string logStr ;
             getline (s, logStr) ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                curLog.print() ;
@@ -880,7 +880,7 @@ public:
             s << "[" << timeStamp << "] " ;
             s << "delete_order -u " << username << " -p " << order_file_pos ;
             getline (s, logStr) ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                curLog.print() ;
@@ -958,7 +958,7 @@ public:
             s << "[" << timeStamp << "] " ;
             s << "add_pending_order -i " << trainID << " -p " << order_file_pos ;
             getline (s, logStr) ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                curLog.print() ;
@@ -988,7 +988,7 @@ public:
             s << "sell_train_seat -i " << trainID << " -T " << trainStartTime.getDateStr() << " -s " << cur_order.getFromStation() << " -t " << cur_order.getToStation() << " -n " << cur_order.getSeatNum() ;
             std::string logStr ;
             getline (s, logStr) ;
-            int preFilePos = get_last_log_pos() ;
+            long long preFilePos = get_last_log_pos() ;
             log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
             #ifdef debug
                curLog.print() ;
@@ -1018,7 +1018,7 @@ public:
                     s << "[" << timeStamp << "] " ;
                     s << "add_train_seat -i " << trainID << " -T " << pending_startTime.getDateStr() << " -s " << pending_order.getFromStation() << " -t " << pending_order.getToStation() << " -n " << pending_order.getSeatNum() ;
                     getline (s, logStr) ;
-                    int preFilePos = get_last_log_pos() ;
+                    long long preFilePos = get_last_log_pos() ;
                     log curLog = log (logStr.c_str(), timeStamp, preFilePos) ;
                     #ifdef debug
                         curLog.print() ;
@@ -1075,7 +1075,7 @@ public:
         trains.find (data (trainID, 0), pos) ;
         train curTrain; train_read (curTrain, pos[0]) ;
         curTrain.addSeats (trainStartTime, fromStation, toStation, num) ;
-        train_write (pos[0], curTrain) ;
+        // train_write (pos[0], curTrain) ;
     }
 
     void delete_order () {
@@ -1127,7 +1127,7 @@ public:
         trains.find (data (trainID, 0), pos) ;
         train curTrain; train_read (curTrain, pos[0]) ;
         curTrain.sellSeats (trainStartTime, fromStation, toStation, num) ;
-        train_write (pos[0], curTrain) ;
+        // train_write (pos[0], curTrain) ;
     }
 
     void change_order_toSuccess() {
@@ -1167,13 +1167,13 @@ public:
         // printf("timeStamp: %d\n", timeStamp) ;
         // printf("targTimeStamp: %d\n", targTimeStamp) ;
         if (targTimeStamp > timeStamp) throw "time travel!" ;
-        int curFilePos = get_last_log_pos() ;
+        long long curFilePos = get_last_log_pos() ;
         while (curFilePos != -1) {
             log curLog; log_read (curLog, curFilePos) ;
             // printf("curLog: timestamp: %d %s\n", curLog.timeStamp, curLog.str) ;
             if (curLog.timeStamp <= targTimeStamp) break ;
             op.clear(); op = std::string (curLog.str) ;
-            // std::cout << op << "\n" ;
+            // if (targTimeStamp == 5900765) std::cout << op << "\n" ;
             isRollback = true; run () ;
             curFilePos = curLog.preFilePos ;
         }

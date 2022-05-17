@@ -6,10 +6,11 @@
 class log {
 public:
     char str[10010] ;
-    int timeStamp, preFilePos ;
+    int timeStamp ;
+    long long preFilePos ;
 
     log () {}
-    log (const char* _str, int _timeStamp, int _preFilePos) {
+    log (const char* _str, int _timeStamp, long long _preFilePos) {
         strcpy (str, _str) ;
         timeStamp = _timeStamp ;
         preFilePos = _preFilePos ;
