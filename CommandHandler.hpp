@@ -2,7 +2,7 @@
 #define TicketSystem_CommandHandler
 
 // #define debug
-// #define rollback
+#define rollbackSwitch
 
 #include <iostream>
 #include <fstream>
@@ -273,7 +273,7 @@ public:
         if (!isRollback) {
             printf ("0\n") ;
 
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
                 logStr += "delete_user -u " ;
                 for (int i = 0; i < username.len; i ++)
@@ -319,7 +319,7 @@ public:
         if (!isRollback) {
             printf ("0\n") ;
 
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ; 
                 logStr += "logout -u " ;
                 logStr = logStr + username.str ;
@@ -350,7 +350,7 @@ public:
         if (!isRollback) {
             printf ("0\n") ;
 
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
                 logStr += "login -u " ;
                 logStr = logStr + username.str ;
@@ -417,7 +417,7 @@ public:
         if (privilege != -1 && privilege >= cur_user.getPrivilege()) throw "invalid privilege" ;
 
         if (!isRollback) {
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
                 logStr += "modify_profile -c " ;
                 logStr = logStr + username.str ;
@@ -522,7 +522,7 @@ public:
         if (!isRollback) {
             printf("0\n") ;
 
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
                 logStr += "delete_train -i " ;
                 logStr = logStr + trainID.str ;
@@ -553,7 +553,7 @@ public:
         if (!isRollback) {
             printf("0\n") ;
 
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
                 logStr += "unrelease_train -i " ;
                 logStr = logStr + trainID.str ;
@@ -622,7 +622,7 @@ public:
         if (!isRollback) {
             printf("0\n") ; 
 
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::string logStr = "["; logStr += int_to_str (timeStamp).str; logStr += "] " ;
                 logStr += "add_train -i " ;
                 logStr = logStr + trainID.str ;
@@ -892,7 +892,7 @@ public:
             orders.insert (data (username, order_file_pos)) ;
             printf("%lld\n", 1ll * ticketNum * cur_train.calPrice (fromStation, toStation)) ;
 
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::stringstream s ;
                 s << "[" << timeStamp << "] " ;
                 s << "add_train_seat -i " << trainID << " -T " << trainStartTime.getDateStr() << " -s " << fromStation << " -t " << toStation << " -n " << ticketNum ;
@@ -923,7 +923,7 @@ public:
             pendingOrders.insert (data (trainID, order_file_pos)) ;
             printf("queue\n") ;
 
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::stringstream s ;
                 std::string logStr ;
                 s << "[" << timeStamp << "] " ;
@@ -951,7 +951,7 @@ public:
 
         // if (trainID == String ("LeavesofGrass")) cur_train.print(date) ;
 
-        train_write (train_file_pos, cur_train) ;
+        // train_write (train_file_pos, cur_train) ;
     }
 
     void query_order () {
@@ -1003,7 +1003,7 @@ public:
         if (cur_order.getStatus() == pending) {
             pendingOrders.erase (data (trainID, order_file_pos)) ;
 
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::stringstream s ;
                 std::string logStr ;
                 s << "[" << timeStamp << "] " ;
@@ -1035,7 +1035,7 @@ public:
             Time trainStartTime = cur_train.getStartTimeFromLeavingTime (cur_order.getLeavingTime(), cur_order.getFromStation()) ;
             cur_train.addSeats (trainStartTime, cur_order.getFromStation(), cur_order.getToStation(), cur_order.getSeatNum()) ;
 
-            #ifdef rollback
+            #ifdef rollbackSwitch
                 std::stringstream s ;
                 s << "[" << timeStamp << "] " ;
                 s << "sell_train_seat -i " << trainID << " -T " << trainStartTime.getDateStr() << " -s " << cur_order.getFromStation() << " -t " << cur_order.getToStation() << " -n " << cur_order.getSeatNum() ;
@@ -1068,7 +1068,7 @@ public:
                 if (pending_order.getSeatNum() <= cur_train.calSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation())) {
                     cur_train.sellSeats (pending_startTime, pending_order.getFromStation(), pending_order.getToStation(), pending_order.getSeatNum()) ;
                     
-                    #ifdef rollback
+                    #ifdef rollbackSwitch
                         s.clear(); logStr.clear() ;
                         s << "[" << timeStamp << "] " ;
                         s << "add_train_seat -i " << trainID << " -T " << pending_startTime.getDateStr() << " -s " << pending_order.getFromStation() << " -t " << pending_order.getToStation() << " -n " << pending_order.getSeatNum() ;
@@ -1085,7 +1085,7 @@ public:
                     order_write (tmp[i], pending_order) ;
                     pendingOrders.erase (data (trainID, tmp[i])) ;
 
-                    #ifdef rollback
+                    #ifdef rollbackSwitch
                         s.clear(); logStr.clear() ;
                         s << "[" << timeStamp << "] " ;
                         s << "change_order_toPending -i " << trainID << " -p " << tmp[i] ;
@@ -1110,7 +1110,7 @@ public:
                     #endif
                 }
             }
-            train_write (train_file_pos, cur_train) ;
+            // train_write (train_file_pos, cur_train) ;
         }
         cur_order.setStatus (refunded) ;
         order_write (order_file_pos, cur_order) ;
@@ -1214,14 +1214,6 @@ public:
         for (int i = 2; i <= key_cnt; i += 2) {
             if (argument[i][1] == 't') targTimeStamp = String (argument[i + 1]).toInt() ;
         }
-
-        // debug
-        // sjtu::vector<int> pos ;
-        // String tmp = String ("LeavesofGrass") ;
-        // trains.find (data (tmp, 0), pos) ;
-        // train debugTrain; train_read (debugTrain, pos[0]) ;
-        // debugTrain.print (Time (String ("08-12"), 0)) ;
-
         // printf("timeStamp: %d\n", timeStamp) ;
         // printf("targTimeStamp: %d\n", targTimeStamp) ;
         if (targTimeStamp > timeStamp) throw "time travel!" ;
@@ -1238,11 +1230,6 @@ public:
         update_last_log_pos (curFilePos) ;
         curUsers.clear() ;
         isRollback = false ;
-
-        // pos.clear() ;
-        // trains.find (data (tmp, 0), pos) ;
-        // train_read (debugTrain, pos[0]) ;
-        // debugTrain.print (Time (String ("08-12"), 0)) ;
 
         printf("0\n") ;
     }
