@@ -5,8 +5,12 @@ import time
 
 # folderName = input ()
 # testcase_num = int(input ())
-folderNames = ['basic_1', 'basic_2', 'basic_3', 'basic_4', 'basic_5', 'basic_6', 'basic_extra', 'pressure_1_easy', 'pressure_1_hard', 'pressure_2_easy', 'pressure_2_hard', 'pressure_3_easy', 'pressure_3_hard']
-testcase_nums = [3, 3, 11, 11, 21, 21, 21, 21, 21, 21, 21, 21, 21]
+
+# folderNames = ['basic_1', 'basic_2', 'basic_3', 'basic_4', 'basic_5', 'basic_6', 'basic_extra', 'pressure_1_easy', 'pressure_1_hard', 'pressure_2_easy', 'pressure_2_hard', 'pressure_3_easy', 'pressure_3_hard']
+# testcase_nums = [1, 1, 5, 5, 10, 10, 10, 10, 10, 10, 10, 10, 10]
+
+folderNames = ['basic_1', 'basic_2', 'basic_3', 'basic_4', 'basic_5', 'basic_6', 'basic_extra', 'pressure_1_easy', 'pressure_2_easy', 'pressure_3_easy']
+testcase_nums = [1, 1, 5, 5, 10, 10, 10, 10, 10, 10]
 
 def runForce():
     for case in range (len (folderNames)):
@@ -32,7 +36,7 @@ def runRollback():
             print("rollback", i, "...")
             os.system("touch test/" + folderName + "/" + str(i) + ".out")
             curCaseT = time.time()
-            os.system("./rollback < TicketSystem/total_rollback/" + folderName + "/" + str(i) + ".in > test/" + folderName + "/" + str(i) + ".out")
+            os.system("./rollback < total_noRoll/" + folderName + "/" + str(i) + ".in > test/" + folderName + "/" + str(i) + ".out")
             curT = time.time() - curCaseT
             print(str(i) + ".in " + str(curT) + " seconds")
         tt = time.time() - t
@@ -50,5 +54,5 @@ def runEvaluate():
                 print("error in", i, "!")
 
 # runForce()
-runRollback()
-# runEvaluate()
+# runRollback()
+runEvaluate()
