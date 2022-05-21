@@ -3,6 +3,8 @@
 #include "B+Tree.hpp"
 // #include "Bpt_and_database.h"
 
+extern bool isExit ;
+
 extern BPlusTree users ;
 extern BPlusTree curUsers ;
 extern BPlusTree trains ;

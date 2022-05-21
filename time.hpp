@@ -89,6 +89,14 @@ public:
         for (int i = _time.m; i < m; i ++) res += days[i] ;
         return res ;
     }
+
+    std::string getDateStr () const {
+        std::stringstream s ;
+        std::string res ;
+        s << std::setw (2) << std::setfill ('0') << m << '-' << std::setw (2) << std::setfill ('0') << d ;
+        s >> res ;
+        return res ;
+    }
 } ;
 
 std::ostream& operator << (std::ostream &out, const Time &_time) {

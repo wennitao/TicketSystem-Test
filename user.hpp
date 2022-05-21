@@ -28,12 +28,24 @@ public:
         if (password != _password) throw "wrong password" ;
     }
 
+    String getPassword () {
+        return password ;
+    }
+
     void modifyPassword (const String &_password) {
         password = _password ;
     }
 
+    String getName () {
+        return name ;
+    }
+
     void modifyName (const String &_name) {
         name = _name ;
+    }
+
+    String getMailAddress () {
+        return mailAddr ;
     }
 
     void modifyMailAddress (const String &_mailAddr) {
