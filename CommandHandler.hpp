@@ -2,7 +2,7 @@
 #define TicketSystem_CommandHandler
 
 // #define debug
-#define rollbackSwitch
+// #define rollbackSwitch
 
 #include <iostream>
 #include <fstream>
