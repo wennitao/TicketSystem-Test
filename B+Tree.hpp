@@ -39,6 +39,7 @@ private:
 
     char file_name[100] ;
     int root = -1, node_cnt = 0 ;
+    // node root_node = NULL ;
     const int node_size = sizeof (node), offset = 2 * sizeof (int) ;
 
 public:
@@ -53,6 +54,7 @@ public:
         } else {
             in.read (reinterpret_cast<char *>(&root), sizeof root) ;
             in.read (reinterpret_cast<char *>(&node_cnt), sizeof node_cnt) ;
+            // if (root >= 0) disk_read (root_node, root) ;
         }
         in.close() ;
         io.open (file, ios::in | ios::out | ios::binary) ;
@@ -77,6 +79,7 @@ public:
         if (root == -1) return 1 ;
         node tmp; disk_read (tmp, root) ;
         return tmp.keyCnt == 0 ;
+        // return root_node.keyCnt == 0 ;
     }
 
     void print (int v) {

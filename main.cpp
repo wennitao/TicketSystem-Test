@@ -76,8 +76,8 @@ bool isExit ;
 
 int main() {
     //freopen("1.in" , "r" , stdin);
-    std::ios::sync_with_stdio(false) ;
-    cin.tie (0); cout.tie (0) ;
+    // std::ios::sync_with_stdio(false) ;
+    // std::cin.tie (0); std::cout.tie (0) ;
 
     init () ;
     std::string op ;
