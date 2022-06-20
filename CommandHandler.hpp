@@ -451,7 +451,7 @@ public:
             str = str + (char)(x % 10 + '0') ;
             x /= 10 ;
         }
-        reverse (str.begin(), str.end()) ;
+        std::reverse (str.begin(), str.end()) ;
         return String (str.c_str()) ;
     }
 
