@@ -13,7 +13,8 @@
 
 #include "main.h"
 // #include "Bpt_and_database.h"
-#include "B+Tree.hpp"
+// #include "B+Tree.hpp"
+#include "BPlusTree.h"
 #include "data.hpp"
 #include "string.h"
 #include "vector.h"
@@ -268,7 +269,7 @@ public:
         if (!pos.empty()) throw "user already exists" ;
         user new_user = user (username, password, name, mailAddr, privilege) ;
         int write_pos = user_write (new_user) ;
-        users.insert (data (username, write_pos)) ;
+        users.Insert (data (username, write_pos), write_pos, write_pos) ;
 
         if (!isRollback) {
             printf ("0\n") ;
@@ -295,7 +296,7 @@ public:
         }
         sjtu::vector<int> pos ;
         users.find (data (username, 0), pos) ;
-        users.erase (data (username, pos[0])) ;
+        users.Remove (data (username, pos[0]), pos[0]) ;
     }
 
     void login () {
@@ -314,7 +315,7 @@ public:
         int user_file_pos = pos[0] ;
         user cur_user; user_read (cur_user, user_file_pos) ;
         cur_user.login (password) ;
-        curUsers.insert (data (username, user_file_pos)) ;
+        curUsers.Insert (data (username, user_file_pos), user_file_pos, user_file_pos) ;
 
         if (!isRollback) {
             printf ("0\n") ;
@@ -342,7 +343,7 @@ public:
         curUsers.find (data (username, 0), pos) ;
         if (pos.empty()) throw "cur user not logged in" ;
         int user_file_pos = pos[0] ;
-        curUsers.erase (data (username, user_file_pos)) ;
+        curUsers.Remove (data (username, user_file_pos), user_file_pos) ;
 
         pos.clear() ;
         users.find (data (username, 0), pos) ;
@@ -513,10 +514,10 @@ public:
         train new_train = train (trainID, stationNum, stations, seatNum, prices, startTime, travelTimes, stopoverTimes, saleDate, type) ;
         new_train.startTimeStr = startTimeStr; new_train.saleDateStr = saleDateStr ;
         int train_file_pos = train_write (new_train) ;
-        trains.insert (data (trainID, train_file_pos)) ;
+        trains.Insert (data (trainID, train_file_pos), train_file_pos, train_file_pos) ;
 
         for (int i = 1; i <= stationNum; i ++) {
-            trainStations.insert (data (stations[i], train_file_pos)) ;
+            trainStations.Insert (data (stations[i], train_file_pos), train_file_pos, train_file_pos) ;
         }
 
         if (!isRollback) {
@@ -614,9 +615,9 @@ public:
         if (cur_train.isReleased()) throw "already released" ;
 
         for (int i = 1; i <= cur_train.getStationNum(); i ++) {
-            trainStations.erase (data (cur_train.getStation(i), train_file_pos)) ;
+            trainStations.Remove (data (cur_train.getStation(i), train_file_pos), train_file_pos) ;
         }
-        trains.erase (data (trainID, train_file_pos)) ;
+        trains.Remove (data (trainID, train_file_pos), train_file_pos) ;
         train_delete (train_file_pos) ;
 
         if (!isRollback) {
@@ -889,7 +890,7 @@ public:
             cur_order.setStatus (success) ;
             cur_train.sellSeats (trainStartTime, fromStation, toStation, ticketNum) ;
             int order_file_pos = order_write (cur_order) ;
-            orders.insert (data (username, order_file_pos)) ;
+            orders.Insert (data (username, order_file_pos), order_file_pos, order_file_pos) ;
             printf("%lld\n", 1ll * ticketNum * cur_train.calPrice (fromStation, toStation)) ;
 
             #ifdef rollbackSwitch
@@ -919,8 +920,8 @@ public:
         } else {
             cur_order.setStatus (pending) ;
             int order_file_pos = order_write (cur_order) ;
-            orders.insert (data (username, order_file_pos)) ;
-            pendingOrders.insert (data (trainID, order_file_pos)) ;
+            orders.Insert (data (username, order_file_pos), order_file_pos, order_file_pos) ;
+            pendingOrders.Insert (data (trainID, order_file_pos), order_file_pos, order_file_pos) ;
             printf("queue\n") ;
 
             #ifdef rollbackSwitch
@@ -1001,7 +1002,7 @@ public:
 
         String trainID = cur_order.getTrainID() ;
         if (cur_order.getStatus() == pending) {
-            pendingOrders.erase (data (trainID, order_file_pos)) ;
+            pendingOrders.Remove (data (trainID, order_file_pos), order_file_pos) ;
 
             #ifdef rollbackSwitch
                 std::stringstream s ;
@@ -1083,7 +1084,7 @@ public:
 
                     pending_order.setStatus (success) ;
                     order_write (tmp[i], pending_order) ;
-                    pendingOrders.erase (data (trainID, tmp[i])) ;
+                    pendingOrders.Remove (data (trainID, tmp[i]), tmp[i]) ;
 
                     #ifdef rollbackSwitch
                         s.clear(); logStr.clear() ;
@@ -1143,7 +1144,7 @@ public:
             if (argument[i][1] == 'u') username = String (argument[i + 1]) ;
             else if (argument[i][1] == 'p') filePos = String (argument[i + 1]).toInt() ;
         }
-        orders.erase (data (username, filePos)) ;
+        orders.Remove (data (username, filePos), filePos) ;
     }
 
     void delete_pending_order () {
@@ -1153,7 +1154,7 @@ public:
             if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
             else if (argument[i][1] == 'p') filePos = String (argument[i + 1]).toInt() ;
         }
-        pendingOrders.erase (data (trainID, filePos)) ;
+        pendingOrders.Remove (data (trainID, filePos), filePos) ;
     }
 
     void add_pending_order () {
@@ -1163,7 +1164,7 @@ public:
             if (argument[i][1] == 'i') trainID = String (argument[i + 1]) ;
             else if (argument[i][1] == 'p') filePos = String (argument[i + 1]).toInt() ;
         }
-        pendingOrders.insert (data (trainID, filePos)) ;
+        pendingOrders.Insert (data (trainID, filePos), filePos, filePos) ;
     }
 
     void sell_train_seat() {

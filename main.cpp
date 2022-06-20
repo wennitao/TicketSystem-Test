@@ -4,15 +4,16 @@
 
 #include "main.h"
 // #include "Bpt_and_database.h"
-#include "B+Tree.hpp"
+// #include "B+Tree.hpp"
+#include "BPlusTree.h"
 #include "CommandHandler.hpp"
 
-BPlusTree users ("users_B+Tree.dat") ;
-BPlusTree curUsers ("curUsers.dat") ;
-BPlusTree trains ("trains_B+Tree.dat") ;
-BPlusTree trainStations ("trainStations.dat") ;
-BPlusTree orders ("orders_B+Tree.dat") ;
-BPlusTree pendingOrders ("pendingOrders.dat") ;
+Tools::BPlusTree<int, int> users ("usersBPT.dat", "usersBPTData.dat") ;
+Tools::BPlusTree<int, int> curUsers ("curUsers.dat", "curUsersData.dat") ;
+Tools::BPlusTree<int, int> trains ("trainsBPT.dat", "trainsBPTData.dat") ;
+Tools::BPlusTree<int, int> trainStations ("trainStations.dat", "trainStationsData.dat") ;
+Tools::BPlusTree<int, int> orders ("ordersBPT.dat", "ordersBPTData.dat") ;
+Tools::BPlusTree<int, int> pendingOrders ("pendingOrders.dat", "pendingOrdersData.dat") ;
 
 std::fstream userio, trainio, orderio, seatio, logio ;
 

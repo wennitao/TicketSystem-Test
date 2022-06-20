@@ -128,6 +128,10 @@ public:
         res.len = r - l + 1 ;
         return res ;
     }
+
+    operator int () {
+        return hash_val ;
+    }
 };
 
 #endif //CODE_ST_RING_H
