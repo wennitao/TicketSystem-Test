@@ -1,16 +1,18 @@
 #include <fstream>
 
-#include "B+Tree.hpp"
+// #include "B+Tree.hpp"
 // #include "Bpt_and_database.h"
+#include "BPlusTree.h"
+#include "data.hpp"
 
 extern bool isExit ;
 
-extern BPlusTree users ;
-extern BPlusTree curUsers ;
-extern BPlusTree trains ;
-extern BPlusTree trainStations ;
-extern BPlusTree orders ;
-extern BPlusTree pendingOrders ;
+extern Tools::BPlusTree<data, int> users ;
+extern Tools::BPlusTree<data, int> curUsers ;
+extern Tools::BPlusTree<data, int> trains ;
+extern Tools::BPlusTree<data, int> trainStations ;
+extern Tools::BPlusTree<data, int> orders ;
+extern Tools::BPlusTree<data, int> pendingOrders ;
 
 extern std::fstream userio ;
 extern std::fstream trainio ;
