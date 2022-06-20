@@ -8,12 +8,12 @@
 #include "BPlusTree.h"
 #include "CommandHandler.hpp"
 
-Tools::BPlusTree<data, int> users ("users.dat", "usersData.dat") ;
-Tools::BPlusTree<data, int> curUsers ("curUsers.dat", "curUsersData.dat") ;
-Tools::BPlusTree<data, int> trains ("trains.dat", "trainsData.dat") ;
-Tools::BPlusTree<data, int> trainStations ("trainStations.dat", "trainStationsData.dat") ;
-Tools::BPlusTree<data, int> orders ("orders.dat", "ordersData.dat") ;
-Tools::BPlusTree<data, int> pendingOrders ("pendingOrders.dat", "pendingOrdersData.dat") ;
+Tools::BPlusTree<int, int> users ("usersBPT.dat", "usersBPTData.dat") ;
+Tools::BPlusTree<int, int> curUsers ("curUsers.dat", "curUsersData.dat") ;
+Tools::BPlusTree<int, int> trains ("trainsBPT.dat", "trainsBPTData.dat") ;
+Tools::BPlusTree<int, int> trainStations ("trainStations.dat", "trainStationsData.dat") ;
+Tools::BPlusTree<int, int> orders ("ordersBPT.dat", "ordersBPTData.dat") ;
+Tools::BPlusTree<int, int> pendingOrders ("pendingOrders.dat", "pendingOrdersData.dat") ;
 
 std::fstream userio, trainio, orderio, seatio, logio ;
 

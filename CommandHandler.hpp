@@ -1,7 +1,7 @@
 #ifndef TicketSystem_CommandHandler
 #define TicketSystem_CommandHandler
 
-#define debug
+// #define debug
 // #define rollbackSwitch
 
 #include <iostream>

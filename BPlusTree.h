@@ -157,6 +157,7 @@ public:
     }
 
     bool Insert(Key index, SecondKey indexSecond, T value) {  //sameKey
+        // std::cerr << "insert " << index << " " << indexSecond << " " << value << std::endl ;
         total++;
         datafile.seekp(0, std::ios::end);
         long long newLoc = datafile.tellp();
@@ -223,6 +224,7 @@ public:
     }
 
     void find(Key index, sjtu::vector<T> &value) {
+        // std::cerr << "find " << index << std::endl ;
         // num = 0;
         FindKey(root, index, value);
     }

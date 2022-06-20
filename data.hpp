@@ -34,6 +34,9 @@ struct data {
     bool operator == (const data &a) const {
         return hash_val == a.hash_val && pos == a.pos ;
     }
+    operator int () {
+        return hash_val ;
+    }
 } ;
 
 #endif
